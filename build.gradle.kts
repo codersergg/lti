@@ -12,7 +12,7 @@ plugins {
 
 val service = project.extensions.getByType<JavaToolchainService>()
 val customLauncher = service.launcherFor {
-    languageVersion.set(JavaLanguageVersion.of(8))
+    languageVersion.set(JavaLanguageVersion.of(11))
 }
 project.tasks.withType<org.jetbrains.kotlin.gradle.tasks.UsesKotlinJavaToolchain>().configureEach {
     kotlinJavaToolchain.toolchain.use(customLauncher)

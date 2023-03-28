@@ -1,1 +1,1 @@
-web: ./build/install/ktor-lti/bin/ktor-lti
+web: java -Dserver.port=$PORT $JAVA_OPTS -jar ./build/install/ktor-lti/bin/ktor-lti

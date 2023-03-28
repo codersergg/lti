@@ -50,18 +50,6 @@ dependencies {
     implementation("commons-codec:commons-codec:$commonsCodecVersion")
 }
 
-/*ktor {
-    docker {
-        portMappings.set(listOf(
-            io.ktor.plugin.features.DockerPortMapping(
-                80,
-                8080,
-                io.ktor.plugin.features.DockerPortMappingProtocol.TCP
-            )
-        ))
-    }
-}*/
-
 tasks {
     create("stage").dependsOn("installDist")
 }

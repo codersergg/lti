@@ -42,7 +42,7 @@ dependencies {
     implementation("commons-codec:commons-codec:$commonsCodecVersion")
 }
 
-ktor {
+/*ktor {
     docker {
         portMappings.set(listOf(
             io.ktor.plugin.features.DockerPortMapping(
@@ -52,7 +52,7 @@ ktor {
             )
         ))
     }
-}
+}*/
 
 tasks {
     create("stage").dependsOn("installDist")

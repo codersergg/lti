@@ -1,1 +1,1 @@
-./gradlew buildFatJar
+web: ./build/install/ktor-lti/bin/ktor-lti

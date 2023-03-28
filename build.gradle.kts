@@ -5,9 +5,17 @@ val kmongoVersion: String by project
 val commonsCodecVersion: String by project
 
 plugins {
-    kotlin("jvm") version "1.7.20"
-    id("io.ktor.plugin") version "2.2.2"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.7.20"
+    kotlin("jvm") version "1.8.10"
+    id("io.ktor.plugin") version "2.2.4"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
+}
+
+val service = project.extensions.getByType<JavaToolchainService>()
+val customLauncher = service.launcherFor {
+    languageVersion.set(JavaLanguageVersion.of(11))
+}
+project.tasks.withType<org.jetbrains.kotlin.gradle.tasks.UsesKotlinJavaToolchain>().configureEach {
+    kotlinJavaToolchain.toolchain.use(customLauncher)
 }
 
 group = "com.codersergg"
@@ -24,7 +32,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk11:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")

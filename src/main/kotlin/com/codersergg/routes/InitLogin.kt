@@ -47,3 +47,13 @@ fun Route.initiateLogin(
         }
     }
 }
+
+fun Route.getSavedInitiateLogin(
+    initLoginDataSource: InitLoginDataSource
+) {
+    get("saved-initiate-login") {
+        initLoginDataSource.getAll()
+        call.respond(HttpStatusCode.OK, initLoginDataSource.getAll().toString())
+    }
+
+}

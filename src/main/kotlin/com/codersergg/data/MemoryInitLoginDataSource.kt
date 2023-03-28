@@ -9,6 +9,10 @@ class MemoryInitLoginDataSource(private val map: MutableMap<String, InitLogin> =
         return map[loginHint]
     }
 
+    override suspend fun getAll(): MutableMap<String, InitLogin> {
+        return map
+    }
+
     override suspend fun putByLoginHint(initLogin: InitLogin): Boolean {
         val key = initLogin.login_hint
         map[key] = initLogin

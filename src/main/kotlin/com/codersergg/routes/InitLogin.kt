@@ -62,7 +62,7 @@ fun Route.getSavedInitiateLogin(
 fun Route.test(
     testDataSource: TestDataSource
 ) {
-    get("test") {
+    post("test") {
         val request = call.request
         testDataSource.addTestDataSource(request)
         call.respond(HttpStatusCode.OK)

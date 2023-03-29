@@ -12,6 +12,4 @@ data class InitLogin(
     val lti_message_hint: String? = null,
     val lti_deployment_id: String? = null,
     val client_id: String? = null,
-    val session: CurrentSession
-
 )

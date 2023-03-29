@@ -33,7 +33,6 @@ fun Route.initiateLogin(
             lti_message_hint = findParameterValue(request, "lti_message_hint"),
             lti_deployment_id = findParameterValue(request, "lti_deployment_id"),
             client_id = findParameterValue(request, "client_id"),
-            session = call.sessions
         )
 
         // проверка уникальности

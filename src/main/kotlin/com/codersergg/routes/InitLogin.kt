@@ -69,10 +69,24 @@ fun Route.test(
     }
 }
 
-fun Route.getAllTest(
+fun Route.getAllHeaderValue(
     testDataSource: TestDataSource
 ) {
-    get("get-all-test") {
-        call.respond(HttpStatusCode.OK, testDataSource.getAllTestDataSource().toString())
+    get("get-all-test-header") {
+        val allTestDataSource = testDataSource.getAllTestDataSource()
+        call.respond(
+            HttpStatusCode.OK,
+            allTestDataSource?.get(allTestDataSource.size - 1)?.acceptItems().toString())
+    }
+}
+
+fun Route.getAllEncoding(
+    testDataSource: TestDataSource
+) {
+    get("get-all-test-encoding") {
+        val allTestDataSource = testDataSource.getAllTestDataSource()
+        call.respond(
+            HttpStatusCode.OK,
+            allTestDataSource?.get(allTestDataSource.size - 1)?.acceptEncodingItems().toString())
     }
 }

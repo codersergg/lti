@@ -1,6 +1,7 @@
 package com.codersergg.routes
 
 import com.codersergg.data.InitLoginDataSource
+import com.codersergg.data.TestDataSource
 import com.codersergg.data.models.InitLogin
 import com.codersergg.data.models.requests.InitLoginRequest
 import io.ktor.http.*
@@ -56,4 +57,22 @@ fun Route.getSavedInitiateLogin(
         call.respond(HttpStatusCode.OK, initLoginDataSource.getAll().toString())
     }
 
+}
+
+fun Route.test(
+    testDataSource: TestDataSource
+) {
+    post("test") {
+        val request = call.request
+        testDataSource.addTestDataSource(request)
+        call.respond(HttpStatusCode.OK)
+    }
+}
+
+fun Route.getAllTest(
+    testDataSource: TestDataSource
+) {
+    post("get-all-test") {
+        call.respond(HttpStatusCode.OK, testDataSource.getAllTestDataSource().toString())
+    }
 }

@@ -63,7 +63,7 @@ fun Route.test(
     testDataSource: TestDataSource
 ) {
     post("test") {
-        val request = call.request
+        val request = call
         testDataSource.addTestDataSource(request)
         call.respond(HttpStatusCode.OK)
     }
@@ -76,7 +76,7 @@ fun Route.getAllHeaderValue(
         val allTestDataSource = testDataSource.getAllTestDataSource()
         call.respond(
             HttpStatusCode.OK,
-            allTestDataSource?.get(allTestDataSource.size - 1)?.acceptItems().toString())
+            allTestDataSource?.get(allTestDataSource.size - 1)?.request?.acceptItems().toString())
     }
 }
 
@@ -87,7 +87,18 @@ fun Route.getAllEncoding(
         val allTestDataSource = testDataSource.getAllTestDataSource()
         call.respond(
             HttpStatusCode.OK,
-            allTestDataSource?.get(allTestDataSource.size - 1)?.acceptEncodingItems().toString())
+            allTestDataSource?.get(allTestDataSource.size - 1)?.request?.acceptEncodingItems().toString())
+    }
+}
+
+fun Route.getAllReceiveText(
+    testDataSource: TestDataSource
+) {
+    get("get-all-test-receive-text") {
+        val allTestDataSource = testDataSource.getAllTestDataSource()
+        call.respond(
+            HttpStatusCode.OK,
+            allTestDataSource?.get(allTestDataSource.size - 1)?.receiveText().toString())
     }
 }
 

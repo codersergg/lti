@@ -1,14 +1,14 @@
 package com.codersergg.data
 
-import io.ktor.server.request.*
+import io.ktor.server.application.*
 
-class MemoryTestDataSource(private val list: ArrayList<ApplicationRequest> = ArrayList()) :
+class MemoryTestDataSource(private val list: ArrayList<ApplicationCall> = ArrayList()) :
     TestDataSource {
-    override suspend fun addTestDataSource(request: ApplicationRequest): Boolean {
+    override suspend fun addTestDataSource(request: ApplicationCall): Boolean {
         return list.add(request)
     }
 
-    override suspend fun getAllTestDataSource(): MutableList<ApplicationRequest> {
+    override suspend fun getAllTestDataSource(): MutableList<ApplicationCall> {
         return list
     }
 }

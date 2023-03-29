@@ -7,16 +7,17 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.net.URLDecoder
 
 fun Route.initiateLogin(
     initLoginDataSource: InitLoginDataSource
 ) {
     post("initiate-login") {
-        val receiveParameters = call.request.queryParameters
+        val request = call.receiveText()
 
-        val isFieldsBlank = !receiveParameters.contains("iss") ||
-                !receiveParameters.contains("login_hint") ||
-                !receiveParameters.contains("target_link_uri")
+        val isFieldsBlank = !request.contains("iss") ||
+                !request.contains("login_hint") ||
+                !request.contains("target_link_uri")
 
         if (isFieldsBlank) {
             call.respond(HttpStatusCode.Conflict, "Fields must not be empty")
@@ -24,12 +25,12 @@ fun Route.initiateLogin(
         }
 
         val initLogin = InitLogin(
-            iss = receiveParameters.get("iss")!!,
-            login_hint = receiveParameters.get("login_hint")!!,
-            target_link_uri = receiveParameters.get("target_link_uri")!!,
-            lti_message_hint = receiveParameters.get("lti_message_hint"),
-            lti_deployment_id = receiveParameters.get("lti_deployment_id"),
-            client_id = receiveParameters.get("client_id")
+            iss = findParameterValue(request, "iss")!!,
+            login_hint = findParameterValue(request, "login_hint")!!,
+            target_link_uri = findParameterValue(request, "target_link_uri")!!,
+            lti_message_hint = findParameterValue(request, "lti_message_hint"),
+            lti_deployment_id = findParameterValue(request, "lti_deployment_id"),
+            client_id = findParameterValue(request, "client_id")
         )
 
         // проверка уникальности
@@ -55,4 +56,14 @@ fun Route.getSavedInitiateLogin(
         call.respond(HttpStatusCode.OK, initLoginDataSource.getAll().toString())
     }
 
+}
+
+private fun findParameterValue(text: String, parameterName: String): String? {
+    val second = text.split('&').map {
+        val parts = it.split('=')
+        val name = parts.firstOrNull() ?: ""
+        val value = parts.drop(1).firstOrNull() ?: ""
+        Pair(name, value)
+    }.firstOrNull { it.first == parameterName }?.second
+    return URLDecoder.decode(second, "UTF-8")
 }

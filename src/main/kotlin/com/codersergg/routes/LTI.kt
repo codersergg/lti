@@ -11,7 +11,7 @@ import io.ktor.server.routing.*
 fun Route.initiateLogin(
     initLoginDataSource: InitLoginDataSource
 ) {
-    post("initiate-login/") {
+    post("initiate-login") {
         val receiveParameters = call.request.queryParameters
 
         val isFieldsBlank = !receiveParameters.contains("iss") ||

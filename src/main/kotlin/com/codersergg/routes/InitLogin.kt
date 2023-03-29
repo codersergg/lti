@@ -32,13 +32,18 @@ fun Route.initiateLogin(
             client_id = findParameterValue(request, "client_id")
         )
 
-        val wasAcknowledged = initLoginDataSource.putByLoginHint(initLogin)
+        // проверка уникальности
+        /*val wasAcknowledged = initLoginDataSource.putByLoginHint(initLogin)
         if (!wasAcknowledged!!) {
             call.respond(HttpStatusCode.Conflict)
             return@post
         } else {
             call.respond(HttpStatusCode.OK)
-        }
+        }*/
+
+        initLoginDataSource.putByLoginHint(initLogin)
+        call.respond(HttpStatusCode.OK)
+
     }
 }
 

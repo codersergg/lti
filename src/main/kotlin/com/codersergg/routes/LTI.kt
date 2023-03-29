@@ -7,6 +7,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
 import java.net.URLDecoder
 
 fun Route.initiateLogin(
@@ -14,6 +15,7 @@ fun Route.initiateLogin(
 ) {
     post("initiate-login") {
         val request = call.receiveText()
+        call.sessions
 
         val isFieldsBlank = !request.contains("iss") ||
                 !request.contains("login_hint") ||
@@ -30,7 +32,8 @@ fun Route.initiateLogin(
             target_link_uri = findParameterValue(request, "target_link_uri")!!,
             lti_message_hint = findParameterValue(request, "lti_message_hint"),
             lti_deployment_id = findParameterValue(request, "lti_deployment_id"),
-            client_id = findParameterValue(request, "client_id")
+            client_id = findParameterValue(request, "client_id"),
+            session = call.sessions
         )
 
         // проверка уникальности

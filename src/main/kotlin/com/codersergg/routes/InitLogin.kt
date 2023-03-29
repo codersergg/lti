@@ -76,7 +76,8 @@ fun Route.getAllHeaderValue(
         val allTestDataSource = testDataSource.getAllTestDataSource()
         call.respond(
             HttpStatusCode.OK,
-            allTestDataSource?.get(allTestDataSource.size - 1)?.request?.acceptItems().toString())
+            allTestDataSource?.get(allTestDataSource.size - 1)?.request?.acceptItems().toString()
+        )
     }
 }
 
@@ -87,7 +88,9 @@ fun Route.getAllEncoding(
         val allTestDataSource = testDataSource.getAllTestDataSource()
         call.respond(
             HttpStatusCode.OK,
-            allTestDataSource?.get(allTestDataSource.size - 1)?.request?.acceptEncodingItems().toString())
+            allTestDataSource?.get(allTestDataSource.size - 1)?.request?.acceptEncodingItems()
+                .toString()
+        )
     }
 }
 
@@ -95,11 +98,9 @@ fun Route.getAllReceiveText(
     testDataSource: TestDataSource
 ) {
     get("get-all-test-receive-text") {
-        val allTestDataSource = testDataSource.getAllTestDataSource()
-        val getLast = allTestDataSource?.get(allTestDataSource.lastIndex)
-        call.respond(
-            HttpStatusCode.OK,
-            getLast?.receive<String>().toString())
+        val allTestDataSource = testDataSource.getAllReceiveText()
+        val text = allTestDataSource[allTestDataSource.lastIndex]
+        call.respondText(text)
     }
 }
 
@@ -108,9 +109,6 @@ fun Route.getSizeTestRequest(
 ) {
     get("get-all-test-size") {
         val allTestDataSource = testDataSource.getAllTestDataSource()
-            call.respond(
-                HttpStatusCode.OK,
-                allTestDataSource?.size.toString()
-            )
+        call.respondText(allTestDataSource?.size.toString())
     }
 }

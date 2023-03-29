@@ -8,7 +8,7 @@ class MemoryTestDataSource(private val list: ArrayList<ApplicationCall> = ArrayL
         return list.add(request)
     }
 
-    override suspend fun getAllTestDataSource(): MutableList<ApplicationCall> {
+    override suspend fun getAllTestDataSource(): ArrayList<ApplicationCall> {
         return list
     }
 }

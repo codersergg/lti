@@ -96,9 +96,10 @@ fun Route.getAllReceiveText(
 ) {
     get("get-all-test-receive-text") {
         val allTestDataSource = testDataSource.getAllTestDataSource()
+        val getLast = allTestDataSource?.get(allTestDataSource.lastIndex)
         call.respond(
             HttpStatusCode.OK,
-            allTestDataSource?.get(allTestDataSource.size - 1)?.receiveText().toString())
+            getLast?.receive<String>().toString())
     }
 }
 
@@ -107,10 +108,9 @@ fun Route.getSizeTestRequest(
 ) {
     get("get-all-test-size") {
         val allTestDataSource = testDataSource.getAllTestDataSource()
-        if (allTestDataSource != null) {
             call.respond(
                 HttpStatusCode.OK,
-                allTestDataSource.size)
-        }
+                allTestDataSource?.size.toString()
+            )
     }
 }

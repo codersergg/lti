@@ -90,3 +90,16 @@ fun Route.getAllEncoding(
             allTestDataSource?.get(allTestDataSource.size - 1)?.acceptEncodingItems().toString())
     }
 }
+
+fun Route.getSizeTestRequest(
+    testDataSource: TestDataSource
+) {
+    get("get-all-test-size") {
+        val allTestDataSource = testDataSource.getAllTestDataSource()
+        if (allTestDataSource != null) {
+            call.respond(
+                HttpStatusCode.OK,
+                allTestDataSource.size)
+        }
+    }
+}

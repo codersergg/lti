@@ -17,6 +17,7 @@ fun Application.configureRouting(
         test(testDataSource)
         getAllHeaderValue(testDataSource)
         getAllEncoding(testDataSource)
+        getSizeTestRequest(testDataSource)
     }
 
 }

@@ -15,7 +15,6 @@ fun Route.initiateLogin(
 ) {
     post("initiate-login") {
         val request = call.receiveText()
-        call.sessions
 
         val isFieldsBlank = !request.contains("iss") ||
                 !request.contains("login_hint") ||

@@ -2,18 +2,16 @@ package com.codersergg.routes
 
 import com.codersergg.data.InitLoginDataSource
 import com.codersergg.data.models.InitLogin
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.http.HttpHeaders.Location
+import io.ktor.http.HttpHeaders.SetCookie
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import io.ktor.server.util.*
+import org.apache.commons.codec.digest.DigestUtils
 import java.net.URLDecoder
 import java.util.*
 
@@ -22,6 +20,7 @@ fun Route.initiateLogin(
     initLoginDataSource: InitLoginDataSource
 ) {
     post("initiate-login") {
+        val SECRET = "qwasrffvw4531r"
         val request = call.receiveText()
         val isFieldsBlank = !request.contains("iss") ||
                 !request.contains("login_hint") ||
@@ -32,6 +31,8 @@ fun Route.initiateLogin(
             return@post
         }
 
+        val session = call.sessions
+        //session.set("session_id", UUID.randomUUID().toString())
         val initLogin = InitLogin(
             iss = findParameterValue(request, "iss")!!,
             login_hint = findParameterValue(request, "login_hint")!!,
@@ -39,8 +40,10 @@ fun Route.initiateLogin(
             lti_message_hint = findParameterValue(request, "lti_message_hint"),
             lti_deployment_id = findParameterValue(request, "lti_deployment_id"),
             client_id = findParameterValue(request, "client_id"),
-            session = call.sessions
+            session = session
         )
+
+        initLoginDataSource.putByLoginHint(initLogin)
 
         // проверка уникальности
         /*val wasAcknowledged = initLoginDataSource.putByLoginHint(initLogin)
@@ -51,47 +54,56 @@ fun Route.initiateLogin(
             call.respond(HttpStatusCode.OK)
         }*/
 
-        val httpClient = HttpClient(CIO) {
-            install(ContentNegotiation) {
-                json()
-            }
+
+        val url = url {
+            protocol = URLProtocol.HTTPS
+            host = initLogin.iss.replace("https://", "")
+
+            parameters.append("scope", "openid")
+            parameters.append("response_type", "id_token")
+            parameters.append("client_id", initLogin.client_id.toString())
+            parameters.append(
+                "redirect_uri",
+                "https://infinite-lowlands-71677.herokuapp.com/redirect"
+            )
+            parameters.append("login_hint", initLogin.login_hint)
+                .also {
+                    if (!initLogin.lti_message_hint.isNullOrBlank()) parameters.append(
+                        "lti_message_hint",
+                        initLogin.lti_message_hint
+                    )
+                }
+            parameters.append("state", UUID.randomUUID().toString())
+            parameters.append("response_mode", "form_post")
+            parameters.append("nonce", UUID.randomUUID().toString())
+            parameters.append("prompt", "none")
         }
 
-        httpClient.post(initLogin.iss) {
-            generateSessionId()
-            url {
-                parameters.append("scope", "openid")
-                parameters.append("response_type", "id_token")
-                parameters.append("client_id", initLogin.client_id.toString())
-                parameters.append(
-                    "redirect_uri",
-                    "https://infinite-lowlands-71677.herokuapp.com/redirect"
-                )
-                parameters.append("login_hint", initLogin.login_hint)
-                    .also {
-                        if (!initLogin.lti_message_hint.isNullOrBlank()) parameters.append(
-                            "lti_message_hint",
-                            initLogin.lti_message_hint
-                        )
-                    }
-                parameters.append("state", UUID.randomUUID().toString())
-                parameters.append("response_mode", "form_post")
-                parameters.append("nonce", UUID.randomUUID().toString())
-                parameters.append("prompt", "none")
-            }
+        val state = UUID.randomUUID().toString()
+        val headers: MutableMap<String, String> = HashMap()
+        headers[Location] = url
+        headers[SetCookie] = DigestUtils.sha256Hex(state)
 
-        }
-
-        initLoginDataSource.putByLoginHint(initLogin)
-
-        call.respond(HttpStatusCode.OK)
-
+        call.respond(HttpStatusCode.Found, headers)
+        return@post
     }
 }
 
-fun Route.initiateLogin() {
-    post("authentication-response") {
+fun Route.authenticationResponse() {
+    get("authentication-response") {
+        call.respondText("GOOD authentication-response!!!")
+    }
+}
 
+fun Route.redirectGet() {
+    post("redirect") {
+        call.respondText("GOOD redirect GET!!!")
+    }
+}
+
+fun Route.redirectPost() {
+    post("redirect") {
+        call.respondText("GOOD redirect POST!!!")
     }
 }
 

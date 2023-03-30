@@ -2,6 +2,9 @@ package com.codersergg.routes
 
 import com.codersergg.data.InitLoginDataSource
 import com.codersergg.data.models.InitLogin
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.http.HttpHeaders.Location
 import io.ktor.http.HttpHeaders.SetCookie
@@ -14,6 +17,7 @@ import io.ktor.server.util.*
 import org.apache.commons.codec.digest.DigestUtils
 import java.net.URLDecoder
 import java.util.*
+import kotlin.collections.set
 
 
 fun Route.initiateLogin(
@@ -80,12 +84,14 @@ fun Route.initiateLogin(
         }
 
         val state = UUID.randomUUID().toString()
-        val headers: MutableMap<String, String> = HashMap()
-        headers[Location] = url
-        headers[SetCookie] = DigestUtils.sha256Hex(state)
 
-        call.respond(HttpStatusCode.Found, headers)
-        return@post
+        val client = HttpClient()
+        client.request(url) {
+            method = HttpMethod.Post
+            headers {
+                append(SetCookie, DigestUtils.sha256Hex(state))
+            }
+        }
     }
 }
 

@@ -13,5 +13,6 @@ fun Application.module() {
     val testDataSource = MemoryTestDataSource()
 
     configureSerialization()
+    configureSession()
     configureRouting(initLoginDataSource = initLoginDataSource, testDataSource = testDataSource)
 }

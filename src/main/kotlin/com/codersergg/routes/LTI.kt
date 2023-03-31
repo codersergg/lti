@@ -65,7 +65,7 @@ fun Route.initiateLogin(
 
         val url = url {
             protocol = URLProtocol.HTTPS
-            host = initLogin.iss.replace("https://", "")
+            host = "https://lti-test-connect.moodlecloud.com/mod/lti/auth.php".replace("https://", "")
 
             parameters.append("scope", "openid")
             parameters.append("response_type", "id_token")

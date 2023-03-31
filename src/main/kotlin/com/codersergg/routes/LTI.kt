@@ -86,7 +86,7 @@ fun Route.initiateLogin(
 
         val state = UUID.randomUUID().toString()
 
-        val client = HttpClient(CIO) {
+        /*val client = HttpClient(CIO) {
             expectSuccess = true
         }
         val httpResponse = client.request(url) {
@@ -97,7 +97,7 @@ fun Route.initiateLogin(
             }
         }
 
-        println(httpResponse)
+        println(httpResponse)*/
 
         /*val httpClient = HttpClient(Apache) {
             engine {
@@ -108,7 +108,7 @@ fun Route.initiateLogin(
         // https://youtrack.jetbrains.com/issue/KTOR-1236
         val response = httpClient.get<HttpResponse>()*/
 
-        //call.respondRedirect(url, false)
+        call.respondRedirect(url, false)
     }
 }
 

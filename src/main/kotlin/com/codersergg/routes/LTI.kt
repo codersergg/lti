@@ -20,6 +20,7 @@ import io.ktor.server.util.*
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.http.HttpResponse
 import org.apache.http.client.methods.RequestBuilder
+import java.io.File
 import java.net.URLDecoder
 import java.util.*
 
@@ -122,18 +123,19 @@ fun Route.authenticationResponsePost() {
     post("authentication-response") {
         println(call.parameters.toString())
         println(call.receiveText())
-        call.respondText("GOOD authentication-response POST!!!")
+        call.respondRedirect("redirect")
     }
 }
 
 fun Route.redirectGet() {
     get("redirect") {
-        call.respondText("GOOD redirect GET!!!")
+        call.respondFile(File("src/main/resources/static/my_interactive_picture.html"))
     }
 }
 
 fun Route.redirectPost() {
     post("redirect") {
+
         call.respondText("GOOD redirect POST!!!")
     }
 }

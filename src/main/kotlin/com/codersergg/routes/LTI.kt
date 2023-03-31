@@ -120,7 +120,8 @@ fun Route.authenticationResponseGet() {
 
 fun Route.authenticationResponsePost() {
     post("authentication-response") {
-        println(call.request.toString())
+        println(call.parameters.toString())
+        println(call.receiveText())
         call.respondText("GOOD authentication-response POST!!!")
     }
 }

@@ -2,9 +2,12 @@ package com.codersergg.routes
 
 import com.codersergg.data.InitLoginDataSource
 import com.codersergg.data.models.InitLogin
+import com.mongodb.assertions.Assertions.assertTrue
 import io.ktor.client.*
+import io.ktor.client.engine.apache.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
+import io.ktor.client.utils.EmptyContent.headers
 import io.ktor.http.*
 import io.ktor.http.HttpHeaders.SetCookie
 import io.ktor.server.application.*
@@ -14,6 +17,8 @@ import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import io.ktor.server.util.*
 import org.apache.commons.codec.digest.DigestUtils
+import org.apache.http.HttpResponse
+import org.apache.http.client.methods.RequestBuilder
 import java.net.URLDecoder
 import java.util.*
 
@@ -80,7 +85,7 @@ fun Route.initiateLogin(
 
         val state = UUID.randomUUID().toString()
 
-        val client = HttpClient(CIO) {
+        /*val client = HttpClient(CIO) {
             expectSuccess = true
         }
         client.request(url) {
@@ -89,7 +94,19 @@ fun Route.initiateLogin(
             headers {
                 append(SetCookie, DigestUtils.sha256Hex(state))
             }
+        }*/
+
+        /*val httpClient = HttpClient(Apache) {
+            engine {
+                followRedirects = true
+            }
+            followRedirects = false
         }
+        // https://youtrack.jetbrains.com/issue/KTOR-1236
+        val response = httpClient.get<HttpResponse>()
+        */
+
+        call.respondRedirect(url, false)
     }
 }
 

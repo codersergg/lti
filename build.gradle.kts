@@ -48,6 +48,8 @@ dependencies {
     implementation("io.ktor:ktor-server-auth:$ktorVersion")
     implementation("io.ktor:ktor-server-html-builder:$ktorVersion")
 
+    implementation("io.ktor:ktor-client-apache:$ktorVersion")
+
     implementation("org.litote.kmongo:kmongo:$kmongoVersion")
     implementation("org.litote.kmongo:kmongo-coroutine:$kmongoVersion")
 

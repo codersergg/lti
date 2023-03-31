@@ -10,6 +10,7 @@ import io.ktor.client.request.*
 import io.ktor.client.utils.EmptyContent.headers
 import io.ktor.http.*
 import io.ktor.http.HttpHeaders.SetCookie
+import io.ktor.http.cio.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -85,7 +86,7 @@ fun Route.initiateLogin(
 
         val state = UUID.randomUUID().toString()
 
-        /*val client = HttpClient(CIO) {
+        val client = HttpClient(CIO) {
             expectSuccess = true
         }
         client.request(url) {
@@ -94,7 +95,7 @@ fun Route.initiateLogin(
             headers {
                 append(SetCookie, DigestUtils.sha256Hex(state))
             }
-        }*/
+        }
 
         /*val httpClient = HttpClient(Apache) {
             engine {
@@ -103,8 +104,7 @@ fun Route.initiateLogin(
             followRedirects = false
         }
         // https://youtrack.jetbrains.com/issue/KTOR-1236
-        val response = httpClient.get<HttpResponse>()
-        */
+        val response = httpClient.get<HttpResponse>()*/
 
         call.respondRedirect(url, false)
     }

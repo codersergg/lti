@@ -64,10 +64,7 @@ fun Route.initiateLogin(
             parameters.append("scope", "openid")
             parameters.append("response_type", "id_token")
             parameters.append("client_id", initLogin.client_id.toString())
-            parameters.append(
-                "redirect_uri",
-                "https://infinite-lowlands-71677.herokuapp.com/redirect"
-            )
+            parameters.append("redirect_uri", initLogin.target_link_uri)
             parameters.append("login_hint", initLogin.login_hint)
                 .also {
                     if (!initLogin.lti_message_hint.isNullOrBlank()) parameters.append(

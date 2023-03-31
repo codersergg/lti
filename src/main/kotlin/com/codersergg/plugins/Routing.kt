@@ -19,7 +19,8 @@ fun Application.configureRouting(
         getAllEncoding(testDataSource)
         getSizeTestRequest(testDataSource)
         getAllReceiveText(testDataSource)
-        authenticationResponse()
+        authenticationResponseGet()
+        authenticationResponsePost()
         redirectGet()
         redirectPost()
     }

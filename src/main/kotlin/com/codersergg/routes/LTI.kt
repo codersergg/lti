@@ -80,9 +80,12 @@ fun Route.initiateLogin(
 
         val state = UUID.randomUUID().toString()
 
-        val client = HttpClient(CIO)
+        val client = HttpClient(CIO) {
+            expectSuccess = true
+        }
         client.request(url) {
             method = HttpMethod.Get
+
             headers {
                 append(SetCookie, DigestUtils.sha256Hex(state))
             }
@@ -90,14 +93,20 @@ fun Route.initiateLogin(
     }
 }
 
-fun Route.authenticationResponse() {
+fun Route.authenticationResponseGet() {
     get("authentication-response") {
-        call.respondText("GOOD authentication-response!!!")
+        call.respondText("GOOD authentication-response GET!!!")
+    }
+}
+
+fun Route.authenticationResponsePost() {
+    post("authentication-response") {
+        call.respondText("GOOD authentication-response POST!!!")
     }
 }
 
 fun Route.redirectGet() {
-    post("redirect") {
+    get("redirect") {
         call.respondText("GOOD redirect GET!!!")
     }
 }

@@ -89,13 +89,15 @@ fun Route.initiateLogin(
         val client = HttpClient(CIO) {
             expectSuccess = true
         }
-        client.request(url) {
+        val httpResponse = client.request(url) {
             method = HttpMethod.Get
 
             headers {
                 append(SetCookie, DigestUtils.sha256Hex(state))
             }
         }
+
+        println(httpResponse)
 
         /*val httpClient = HttpClient(Apache) {
             engine {

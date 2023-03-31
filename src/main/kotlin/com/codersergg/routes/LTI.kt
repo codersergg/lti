@@ -106,7 +106,7 @@ fun Route.initiateLogin(
         // https://youtrack.jetbrains.com/issue/KTOR-1236
         val response = httpClient.get<HttpResponse>()*/
 
-        call.respondRedirect(url, false)
+        //call.respondRedirect(url, false)
     }
 }
 

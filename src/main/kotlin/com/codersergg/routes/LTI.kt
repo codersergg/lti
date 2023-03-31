@@ -12,13 +12,16 @@ import java.io.File
 import java.net.URLDecoder
 import java.util.*
 
-
 fun Route.initiateLogin(
     initLoginDataSource: InitLoginDataSource
 ) {
     post("initiate-login") {
         // SECRET key Moodle: save in DB or EV
-        val SECRET = "qwasrffvw4531r"
+        //val SECRET = "qwasrffvw4531r"
+
+        // url запроса аутентификации в LMS, смотреть в настройках LMS
+        val authUrl = "lti-test-connect.moodlecloud.com/mod/lti/auth.php"
+
         val request = call.receiveText()
         val isFieldsBlank = !request.contains("iss") ||
                 !request.contains("login_hint") ||
@@ -51,8 +54,7 @@ fun Route.initiateLogin(
 
         val url = url {
             protocol = URLProtocol.HTTPS
-            host =
-                "https://lti-test-connect.moodlecloud.com/mod/lti/auth.php".replace("https://", "")
+            host = authUrl
 
             parameters.append("scope", "openid")
             parameters.append("response_type", "id_token")
@@ -94,6 +96,7 @@ fun Route.redirectGet() {
     }
 }
 
+// Роут для проверки наличия запроса на аутентификацию
 fun Route.getSavedInitiateLogin(
     initLoginDataSource: InitLoginDataSource
 ) {

@@ -52,6 +52,8 @@ fun Route.initiateLogin(
             call.respond(HttpStatusCode.OK)
         }*/
 
+        val state = UUID.randomUUID().toString()
+        val nonce = UUID.randomUUID().toString()
         val url = url {
             protocol = URLProtocol.HTTPS
             host = authUrl
@@ -67,13 +69,12 @@ fun Route.initiateLogin(
                         initLogin.lti_message_hint
                     )
                 }
-            parameters.append("state", UUID.randomUUID().toString())
+            parameters.append("state", state)
             parameters.append("response_mode", "form_post")
-            parameters.append("nonce", UUID.randomUUID().toString())
+            parameters.append("nonce", nonce)
             parameters.append("prompt", "none")
         }
 
-        val state = UUID.randomUUID().toString()
         call.respondRedirect(url, false)
         TODO("Save state for checking")
     }
@@ -81,8 +82,10 @@ fun Route.initiateLogin(
 
 fun Route.authenticationResponsePost() {
     post("authentication-response") {
-        println(call.parameters.toString())
-        println(call.receiveText())
+        val jwtMessage = call.parameters.toString()
+        val decode = Base64.getDecoder().decode(jwtMessage)
+        println("jwtMessage:$jwtMessage")
+        println("decode:$decode")
         call.respondRedirect("redirect")
         TODO("Check token")
     }

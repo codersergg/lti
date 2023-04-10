@@ -8,6 +8,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
+import org.apache.commons.codec.digest.DigestUtils
 import java.io.File
 import java.net.URLDecoder
 import java.util.*
@@ -82,10 +83,10 @@ fun Route.initiateLogin(
 
 fun Route.authenticationResponsePost() {
     post("authentication-response") {
-        val jwtMessage = call.parameters.toString()
         val receiveText = call.receiveText()
-        println("jwtMessage:$jwtMessage")
         println("receiveText:$receiveText")
+        val sha256Digest = DigestUtils.getSha256Digest()
+        println("sha256Digest:$sha256Digest")
         call.respondRedirect("redirect")
         TODO("Check token")
     }

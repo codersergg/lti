@@ -83,9 +83,9 @@ fun Route.initiateLogin(
 fun Route.authenticationResponsePost() {
     post("authentication-response") {
         val jwtMessage = call.parameters.toString()
-        //val decode = Base64.getDecoder().decode(jwtMessage)
+        val receiveText = call.receiveText()
         println("jwtMessage:$jwtMessage")
-        //println("decode:$decode")
+        println("receiveText:$receiveText")
         call.respondRedirect("redirect")
         TODO("Check token")
     }

@@ -4,10 +4,13 @@ import com.codersergg.data.InitLoginDataSource
 import com.codersergg.data.models.InitLogin
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
+import org.litote.kmongo.json
 import java.io.File
 import java.net.URLDecoder
 import java.security.KeyFactory
@@ -86,6 +89,10 @@ fun Route.authenticationResponsePost() {
     post("authentication-response") {
         val receiveText = call.receiveText()
         println("receiveText:$receiveText")
+
+        val principal = call.principal<JWTPrincipal>()
+        println("payload: " + principal!!.payload.json)
+
         call.respondRedirect("redirect")
         TODO("Check token")
     }

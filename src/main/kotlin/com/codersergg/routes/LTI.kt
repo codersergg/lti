@@ -82,7 +82,6 @@ fun Route.initiateLogin(
         }
 
         call.respondRedirect(url, false)
-        TODO("Save state for checking")
     }
 }
 

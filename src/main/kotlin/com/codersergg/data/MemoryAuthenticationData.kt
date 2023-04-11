@@ -8,6 +8,10 @@ class MemoryAuthenticationData(private val map: MutableMap<String, State> = Hash
         return map[state]?.state.equals(state)
     }
 
+    override suspend fun getNonce(state: String): String {
+        return map[state]?.nonce.toString()
+    }
+
     override suspend fun putState(state: State): Boolean {
         return map.put(state.state, state) != null
     }

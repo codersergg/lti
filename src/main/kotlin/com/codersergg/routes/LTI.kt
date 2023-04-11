@@ -58,8 +58,8 @@ fun Route.initiateLogin(
         }*/
 
         val state = UUID.randomUUID().toString()
-        authenticationData.putState(State(state = state))
         val nonce = UUID.randomUUID().toString()
+        authenticationData.putState(State(state = state, nonce = nonce))
         val url = url {
             protocol = URLProtocol.HTTPS
             host = authUrl
@@ -103,9 +103,15 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         val header = String(decoder.decode(chunks[0]))
         val payload = String(decoder.decode(chunks[1]))
 
+        val nonce = authenticationData.getNonce(state.toString())
+
+        if (!payload.contains("\"nonce\":\"$nonce\"")) {
+            call.respond(HttpStatusCode.Conflict, "Wrong nonce")
+            return@post
+        }
+
         println("header: $header")
         println("payload: $payload")
-
 
         call.respondRedirect("redirect")
         TODO("Check token")

@@ -99,6 +99,26 @@ fun Route.redirectGet() {
     }
 }
 
+fun Route.getPublicKey() {
+    get("public-key") {
+        val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode("SECRET"))
+        println(keySpecPKCS8)
+        val publicKey = KeyFactory.getInstance("RSA").generatePublic(keySpecPKCS8)
+        println(publicKey)
+        call.respond(publicKey)
+    }
+}
+
+fun Route.getPublicKeyPost() {
+    post("public-key") {
+        val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode("SECRET"))
+        println(keySpecPKCS8)
+        val publicKey = KeyFactory.getInstance("RSA").generatePublic(keySpecPKCS8)
+        println(publicKey)
+        call.respond(publicKey)
+    }
+}
+
 // Роут для проверки наличия запроса на аутентификацию
 fun Route.getSavedInitiateLogin(
     initLoginDataSource: InitLoginDataSource
@@ -109,15 +129,6 @@ fun Route.getSavedInitiateLogin(
     }
 }
 
-fun Route.getPublicKey() {
-    post("public-key") {
-        val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode("SECRET"))
-        println(keySpecPKCS8)
-        val publicKey = KeyFactory.getInstance("RSA").generatePublic(keySpecPKCS8)
-        println(publicKey)
-        call.respond(publicKey)
-    }
-}
 
 private fun findParameterValue(text: String, parameterName: String): String? {
     val second = text.split('&').map {

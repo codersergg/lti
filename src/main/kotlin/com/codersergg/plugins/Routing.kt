@@ -22,6 +22,7 @@ fun Application.configureRouting(
         authenticationResponsePost()
         redirectGet()
         getPublicKey()
+        getPublicKeyPost()
     }
 
 }

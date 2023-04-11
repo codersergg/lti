@@ -101,7 +101,6 @@ fun Route.redirectGet() {
 
 fun Route.getPublicKey() {
     get("public-key") {
-
         val data: ByteArray = Base64.getDecoder()
             .decode("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDR3WR47goUtiHKHPnlLTzS5YY2V4Kj4stKO+OLBv5QVnWMhWplXBAbdvBMTMTLbM51ay0Pb8+ldXkzXMLLsIyHx3j6eFZ3nYp3O1OAo6poQmPrWWm/eIroCQy34eiW3+2g0XMLs21CuNVUMA1kHMOc3ICBNJ43091Cx/4anEq2vQIDAQAB".toByteArray())
         val spec = X509EncodedKeySpec(data)
@@ -110,7 +109,7 @@ fun Route.getPublicKey() {
         val publicKey = fact.generatePublic(spec)
         println("publicKey$publicKey")
 
-        call.respond(publicKey)
+        call.respond("publicKey")
     }
 }
 
@@ -124,7 +123,7 @@ fun Route.getPublicKeyPost() {
         val publicKey = fact.generatePublic(spec)
         println("publicKey$publicKey")
 
-        call.respond(publicKey)
+        call.respond("publicKey")
     }
 }
 

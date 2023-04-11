@@ -86,17 +86,15 @@ fun Route.initiateLogin(
 }
 
 fun Route.authenticationResponsePost() {
-    authenticate("auth-jwt") {
-        post("authentication-response") {
-            val receiveText = call.receiveText()
-            println("receiveText:$receiveText")
+    post("authentication-response") {
+        val receiveText = call.receiveText()
+        println("receiveText:$receiveText")
 
-            val principal = call.principal<JWTPrincipal>()
-            println("payload: " + principal!!.payload.json)
+        val principal = call.principal<JWTPrincipal>()
+        println("payload: " + principal!!.payload.json)
 
-            call.respondRedirect("redirect")
-            TODO("Check token")
-        }
+        call.respondRedirect("redirect")
+        TODO("Check token")
     }
 }
 

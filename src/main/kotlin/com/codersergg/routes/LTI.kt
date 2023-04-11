@@ -55,6 +55,7 @@ fun Route.initiateLogin(
         }*/
 
         val state = UUID.randomUUID().toString()
+        println(state)
         val nonce = UUID.randomUUID().toString()
         val url = url {
             protocol = URLProtocol.HTTPS
@@ -87,8 +88,11 @@ fun Route.authenticationResponsePost() {
         val receiveText = call.receiveText()
         println("receiveText:$receiveText")
 
-        /*val principal = call.principal<JWTPrincipal>()
-        println("payload: " + principal!!.payload.json)*/
+        val token = findParameterValue(receiveText, "id_token")
+        val state = findParameterValue(receiveText, "state")
+
+        println("id_token: $token")
+        println("state: $state")
 
         call.respondRedirect("redirect")
         TODO("Check token")

@@ -8,7 +8,6 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
-import org.apache.commons.codec.digest.DigestUtils
 import java.io.File
 import java.net.URLDecoder
 import java.security.KeyFactory
@@ -87,8 +86,6 @@ fun Route.authenticationResponsePost() {
     post("authentication-response") {
         val receiveText = call.receiveText()
         println("receiveText:$receiveText")
-        val sha256Digest = DigestUtils.getSha256Digest()
-        println("sha256Digest:$sha256Digest")
         call.respondRedirect("redirect")
         TODO("Check token")
     }
@@ -113,7 +110,7 @@ fun Route.getSavedInitiateLogin(
 }
 
 fun Route.getPublicKey() {
-    get("public-key") {
+    post("public-key") {
         val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode("SECRET"))
         println(keySpecPKCS8)
         val publicKey = KeyFactory.getInstance("RSA").generatePublic(keySpecPKCS8)

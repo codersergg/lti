@@ -1,7 +1,9 @@
 package com.codersergg.routes
 
+import com.codersergg.data.AuthenticationData
 import com.codersergg.data.InitLoginDataSource
 import com.codersergg.data.models.InitLogin
+import com.codersergg.data.models.State
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -15,7 +17,8 @@ import java.security.spec.X509EncodedKeySpec
 import java.util.*
 
 fun Route.initiateLogin(
-    initLoginDataSource: InitLoginDataSource
+    initLoginDataSource: InitLoginDataSource,
+    authenticationData: AuthenticationData
 ) {
     post("initiate-login") {
         // SECRET key Moodle: save in DB or EV
@@ -55,7 +58,7 @@ fun Route.initiateLogin(
         }*/
 
         val state = UUID.randomUUID().toString()
-        println("state: $state")
+        authenticationData.putState(State(state = state))
         val nonce = UUID.randomUUID().toString()
         val url = url {
             protocol = URLProtocol.HTTPS
@@ -83,16 +86,20 @@ fun Route.initiateLogin(
     }
 }
 
-fun Route.authenticationResponsePost() {
+fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
     post("authentication-response") {
         val receiveText = call.receiveText()
-        println("receiveText:$receiveText")
 
         val token = findParameterValue(receiveText, "id_token")
         val state = findParameterValue(receiveText, "state")
 
         println("id_token: $token")
         println("state: $state")
+
+        if (!authenticationData.isCorrectState(state.toString())) {
+            call.respond(HttpStatusCode.Conflict, "Wrong state")
+            return@post
+        }
 
         call.respondRedirect("redirect")
         TODO("Check token")

@@ -101,9 +101,9 @@ fun Route.redirectGet() {
 
 fun Route.getPublicKey() {
     get("public-key") {
-        val keySpecPKCS8 = X509EncodedKeySpec(Base64.getDecoder().decode("SECRET"))
-        println(keySpecPKCS8)
-        val publicKey = KeyFactory.getInstance("RSA").generatePublic(keySpecPKCS8)
+        val keySpec = X509EncodedKeySpec(Base64.getDecoder().decode("SECRET"))
+        println(keySpec)
+        val publicKey = KeyFactory.getInstance("RSA").generatePublic(keySpec)
         println(publicKey)
         call.respond(publicKey)
     }
@@ -111,9 +111,9 @@ fun Route.getPublicKey() {
 
 fun Route.getPublicKeyPost() {
     post("public-key") {
-        val keySpecPKCS8 = X509EncodedKeySpec(Base64.getDecoder().decode("SECRET"))
-        println(keySpecPKCS8)
-        val publicKey = KeyFactory.getInstance("RSA").generatePublic(keySpecPKCS8)
+        val keySpec = X509EncodedKeySpec(Base64.getDecoder().decode("SECRET"))
+        println(keySpec)
+        val publicKey = KeyFactory.getInstance("RSA").generatePublic(keySpec)
         println(publicKey)
         call.respond(publicKey)
     }

@@ -102,7 +102,7 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
 
         val nonce = authenticationData.getNonce(state.toString())
 
-        if (!payload.contains("\"nonce\":\"$nonce\"")) {
+        if (!payload.contains("\"nonce_\":\"$nonce\"")) {
             call.respond(HttpStatusCode.Conflict, "Wrong nonce")
             return@post
         }

@@ -107,9 +107,9 @@ fun Route.getPublicKey() {
         val fact = KeyFactory.getInstance("RSA")
 
         val publicKey = fact.generatePublic(spec)
-        println("publicKey$publicKey")
+        println("publicKey:$publicKey")
 
-        call.respond("publicKey")
+        call.respond(publicKey)
     }
 }
 
@@ -121,9 +121,9 @@ fun Route.getPublicKeyPost() {
         val fact = KeyFactory.getInstance("RSA")
 
         val publicKey = fact.generatePublic(spec)
-        println("publicKey$publicKey")
+        println("publicKey:$publicKey")
 
-        call.respond("publicKey")
+        call.respond(publicKey)
     }
 }
 

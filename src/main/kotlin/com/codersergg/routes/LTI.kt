@@ -55,7 +55,7 @@ fun Route.initiateLogin(
         }*/
 
         val state = UUID.randomUUID().toString()
-        println(state)
+        println("state: $state")
         val nonce = UUID.randomUUID().toString()
         val url = url {
             protocol = URLProtocol.HTTPS

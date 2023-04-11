@@ -93,8 +93,15 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         val token = findParameterValue(receiveText, "id_token")
         val state = findParameterValue(receiveText, "state")
 
-        println("id_token: $token")
-        println("state: $state")
+        val decoder = Base64.getUrlDecoder()
+
+        val chunks = token!!.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }
+            .toTypedArray()
+        val header = String(decoder.decode(chunks[0]))
+        val payload = String(decoder.decode(chunks[1]))
+
+        println("header: $header")
+        println("payload: $payload")
 
         if (!authenticationData.isCorrectState(state.toString())) {
             call.respond(HttpStatusCode.Conflict, "Wrong state")

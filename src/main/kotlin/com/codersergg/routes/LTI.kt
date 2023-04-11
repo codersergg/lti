@@ -11,7 +11,6 @@ import io.ktor.server.util.*
 import java.io.File
 import java.net.URLDecoder
 import java.security.KeyFactory
-import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import java.util.*
 
@@ -102,7 +101,7 @@ fun Route.redirectGet() {
 
 fun Route.getPublicKey() {
     get("public-key") {
-        val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode("SECRET"))
+        val keySpecPKCS8 = X509EncodedKeySpec(Base64.getDecoder().decode("SECRET"))
         println(keySpecPKCS8)
         val publicKey = KeyFactory.getInstance("RSA").generatePublic(keySpecPKCS8)
         println(publicKey)

@@ -109,7 +109,7 @@ fun Route.getPublicKey() {
         val publicKey = fact.generatePublic(spec)
         println("publicKey:$publicKey")
 
-        call.respond(publicKey)
+        call.respond("publicKey")
     }
 }
 
@@ -123,7 +123,7 @@ fun Route.getPublicKeyPost() {
         val publicKey = fact.generatePublic(spec)
         println("publicKey:$publicKey")
 
-        call.respond(publicKey)
+        call.respond("publicKey")
     }
 }
 

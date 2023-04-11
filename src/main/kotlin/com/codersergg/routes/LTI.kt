@@ -86,7 +86,7 @@ fun Route.initiateLogin(
 }
 
 fun Route.authenticationResponsePost() {
-    authenticate {
+    authenticate("auth-jwt") {
         post("authentication-response") {
             val receiveText = call.receiveText()
             println("receiveText:$receiveText")

@@ -21,6 +21,7 @@ fun Application.configureRouting(
         getAllReceiveText(testDataSource)
         authenticationResponsePost()
         redirectGet()
+        getPublicKey()
     }
 
 }

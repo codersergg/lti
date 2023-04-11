@@ -11,6 +11,8 @@ import io.ktor.server.util.*
 import org.apache.commons.codec.digest.DigestUtils
 import java.io.File
 import java.net.URLDecoder
+import java.security.KeyFactory
+import java.security.spec.PKCS8EncodedKeySpec
 import java.util.*
 
 fun Route.initiateLogin(
@@ -107,6 +109,16 @@ fun Route.getSavedInitiateLogin(
     get("saved-initiate-login") {
         initLoginDataSource.getAll()
         call.respond(HttpStatusCode.OK, initLoginDataSource.getAll().toString())
+    }
+}
+
+fun Route.getPublicKey() {
+    get("public-key") {
+        val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode("SECRET"))
+        println(keySpecPKCS8)
+        val publicKey = KeyFactory.getInstance("RSA").generatePublic(keySpecPKCS8)
+        println(publicKey)
+        call.respond(publicKey)
     }
 }
 

@@ -114,7 +114,6 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         println("payload: $payload")
 
         call.respondRedirect("redirect")
-        TODO("Check token")
     }
 }
 

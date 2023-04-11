@@ -96,11 +96,9 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
             return@post
         }
 
-        val decoder = Base64.getUrlDecoder()
-        val chunks = token!!.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }
-            .toTypedArray()
-        val header = String(decoder.decode(chunks[0]))
-        val payload = String(decoder.decode(chunks[1]))
+        val chunks = token!!.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val header = String(Base64.getUrlDecoder().decode(chunks[0]))
+        val payload = String(Base64.getUrlDecoder().decode(chunks[1]))
 
         val nonce = authenticationData.getNonce(state.toString())
 

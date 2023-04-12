@@ -126,15 +126,15 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         }
         // Check Client ID
         val clientId = state.clientId
-        val jsonClientId = jsonPayload["aud"]
-        if ((jsonClientId != null) && !jsonClientId.equals(clientId)) {
+        val jsonClientId = jsonPayload["aud"].toString()
+        if (!jsonClientId.contains(clientId)) {
             call.respond(HttpStatusCode.Conflict, "Wrong Client ID")
             return@post
         }
         // Check end User identifier
         val endUserIdentifier = state.endUserIdentifier
-        val jsonEndUserIdentifier = jsonPayload["sub"]
-        if ((jsonEndUserIdentifier != null) && !jsonEndUserIdentifier.equals(endUserIdentifier)) {
+        val jsonEndUserIdentifier = jsonPayload["sub"].toString()
+        if (!jsonEndUserIdentifier.contains(endUserIdentifier)) {
             call.respond(HttpStatusCode.Conflict, "Wrong Users Identifier")
             return@post
         }
@@ -153,6 +153,12 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         // The Tool MAY use the iat Claim to reject tokens that were issued too far away from the
         // current time, limiting the amount of time that it needs to store nonces used to prevent
         // attacks. The Tool MAY define its own acceptable time range
+        // https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
+
+        TODO()
+        // Check token
+        // The Tool MUST Validate the signature of the ID Token according to JSON Web
+        // Signature [RFC7515], Section 5.2 using the Public Key from the Platform
         // https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
 
     }

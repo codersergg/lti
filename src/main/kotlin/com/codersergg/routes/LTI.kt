@@ -167,7 +167,7 @@ fun Route.authenticationResponsePost(
         println("payload: $payload")
 
         val publicKey = jwkProvider.get("6f8856ed-9189-488f-9011-0ff4b6c08edc").publicKey
-        val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyString))
+        val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode("privateKeyString"))
         val privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpecPKCS8)
 
         val respondToken = JWT.create()

@@ -164,7 +164,7 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         println("status: $status")*/
         call.respondRedirect("redirect")
 
-        // TODO
+        // TO DO
         // Check exp
         // The current time MUST be before the time represented by the exp Claim
         // https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation

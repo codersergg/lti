@@ -17,5 +17,4 @@ fun Application.module() {
     configureSerialization()
     configureMonitoring()
     configureRouting(initLoginDataSource, testDataSource, authenticationData)
-    configureSecurity()
 }

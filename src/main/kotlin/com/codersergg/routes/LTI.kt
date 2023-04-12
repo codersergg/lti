@@ -144,7 +144,9 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         val updatedState = authenticationData.getState(stateAuthResponse.toString())
         println("updatedState: $updatedState")
         val lineitems = jsonPayload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]
-            ?.jsonObject?.get("lineitems").toString().replace("\"", "")
+            ?.jsonObject?.get("lineitems").toString()
+            .replace("\"", "")
+            .replace("https//", "")
         println("lineitems: $lineitems")
         authenticationData.putState(updatedState)
         println(updatedState)
@@ -155,6 +157,7 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         val status = HttpClient().use { client ->
             client.get(
                 url {
+                    protocol = URLProtocol.HTTPS
                     host = lineitems
                 }
             ) {

@@ -4,6 +4,8 @@ import com.codersergg.data.AuthenticationData
 import com.codersergg.data.InitLoginDataSource
 import com.codersergg.data.models.InitLogin
 import com.codersergg.data.models.State
+import io.ktor.client.*
+import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -141,17 +143,16 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
 
         val updatedState = authenticationData.getState(stateAuthResponse.toString())
         println("updatedState: $updatedState")
-        val jsonElement = jsonPayload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]?.jsonObject
-        val jsonElement1 = jsonElement?.get("lineitems")
-        println("https://purl.imsglobal.org/spec/lti-ags/claim/endpoint: $jsonElement1")
-        println("lineitems: $jsonElement")
+        val lineitems = jsonPayload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]
+            ?.jsonObject?.get("lineitems").toString().replace("\"", "")
+        println("lineitems: $lineitems")
         authenticationData.putState(updatedState)
         println(updatedState)
 
         println("header: $header")
         println("payload: $payload")
 
-        /*val status = HttpClient().use { client ->
+        val status = HttpClient().use { client ->
             client.get(
                 url {
                     protocol = URLProtocol.HTTPS
@@ -164,7 +165,7 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
                 }
             }
         }
-        println("status: $status")*/
+        println("status: $status")
         call.respondRedirect("redirect")
 
         // TO DO

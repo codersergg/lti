@@ -171,8 +171,8 @@ fun Route.authenticationResponsePost(
         val privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpecPKCS8)
 
         val respondToken = JWT.create()
-            .withClaim("iss", jsonPayload["iss"].toString().replace("\"", ""))
-            .withClaim("aud", jsonClientId.replace("\"", ""))
+            .withClaim("iss", "914tL6Nm7c7Kba7")
+            .withClaim("aud", "https://infinite-lowlands-71677.herokuapp.com/authentication-response")
             .withClaim("nonce", jsonNonce.replace("\"", ""))
             .withClaim("exp", jsonPayload["exp"].toString().replace("\"", ""))
             .withClaim("iat", jsonPayload["iat"].toString().replace("\"", ""))

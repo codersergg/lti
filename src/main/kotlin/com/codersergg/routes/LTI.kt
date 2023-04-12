@@ -254,12 +254,6 @@ fun Route.redirect() {
     }
 }*/
 
-fun Route.cert() {
-    get(".well-known") {
-        call.respondFile(File("src/main/resources/static/jwks.json"))
-    }
-}
-
 fun Route.getPublicKey() {
     get("public-key") {
         val data: ByteArray = Base64.getDecoder()
@@ -297,7 +291,6 @@ fun Route.getSavedInitiateLogin(
         call.respond(HttpStatusCode.OK, initLoginDataSource.getAll().toString())
     }
 }
-
 
 private fun findParameterValue(text: String, parameterName: String): String? {
     val second = text.split('&').map {

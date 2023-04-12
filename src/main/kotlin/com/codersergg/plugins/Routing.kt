@@ -27,7 +27,6 @@ fun Application.configureRouting(
         redirect()
         getPublicKey()
         getPublicKeyPost()
-        cert()
     }
 
 }

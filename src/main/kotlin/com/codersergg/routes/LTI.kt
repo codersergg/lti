@@ -162,7 +162,7 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
                 }
             ) {
                 headers {
-                    append(HttpHeaders.Accept, "application/vnd.ims.lis.v2.lineitem+json")
+                    append(HttpHeaders.Accept, "application/vnd.ims.lis.v2.lineitemcontainer+json")
                     //append(HttpHeaders.Authorization, "abc123")
                 }
             }

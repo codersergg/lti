@@ -146,7 +146,7 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         val lineitems = jsonPayload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]
             ?.jsonObject?.get("lineitems").toString()
             .replace("\"", "")
-            .replace("https//", "")
+            .replace("https://", "")
         println("lineitems: $lineitems")
         authenticationData.putState(updatedState)
         println(updatedState)

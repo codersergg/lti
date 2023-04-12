@@ -4,8 +4,6 @@ import com.codersergg.data.AuthenticationData
 import com.codersergg.data.InitLoginDataSource
 import com.codersergg.data.models.InitLogin
 import com.codersergg.data.models.State
-import io.ktor.client.*
-import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -150,7 +148,7 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
 
         val lineitems = authenticationData.getState(stateAuthResponse).lineitems!!
         println("lineitems: $lineitems")
-        val status = HttpClient().use { client ->
+        /*val status = HttpClient().use { client ->
             client.get(
                 url {
                     protocol = URLProtocol.HTTPS
@@ -163,10 +161,10 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
                 }
             }
         }
-        println("status: $status")
+        println("status: $status")*/
         call.respondRedirect("redirect")
 
-        TODO()
+        // TODO
         // Check exp
         // The current time MUST be before the time represented by the exp Claim
         // https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation

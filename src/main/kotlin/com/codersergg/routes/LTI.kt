@@ -142,6 +142,7 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         val updatedState = authenticationData.getState(stateAuthResponse.toString())
         updatedState.lineitems = jsonPayload["jsonPayload"]?.toString()
         authenticationData.putState(updatedState)
+        println(updatedState)
 
         println("header: $header")
         println("payload: $payload")

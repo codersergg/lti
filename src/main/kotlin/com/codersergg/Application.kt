@@ -15,11 +15,10 @@ fun Application.module() {
     val initLoginDataSource = MemoryInitLoginDataSource()
     val testDataSource = MemoryTestDataSource()
     val authenticationData = MemoryAuthenticationData()
-    val jwkProvider =
-        JwkProviderBuilder("https://infinite-lowlands-71677.herokuapp.com/.well-known")
-            .cached(10, 24, TimeUnit.HOURS)
-            .rateLimited(10, 1, TimeUnit.MINUTES)
-            .build()
+    val jwkProvider = JwkProviderBuilder("http://0.0.0.0:8080/")
+        .cached(10, 24, TimeUnit.HOURS)
+        .rateLimited(10, 1, TimeUnit.MINUTES)
+        .build()
 
     configureSerialization()
     configureMonitoring()

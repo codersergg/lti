@@ -7,8 +7,6 @@ import com.codersergg.data.AuthenticationData
 import com.codersergg.data.InitLoginDataSource
 import com.codersergg.data.models.InitLogin
 import com.codersergg.data.models.State
-import io.ktor.client.*
-import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -196,8 +194,9 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
             .withClaim("iat", jsonPayload["iat"].toString().replace("\"", ""))
             .withExpiresAt(Date(System.currentTimeMillis() + 60000))
             .sign(Algorithm.RSA256(publicKey as RSAPublicKey, privateKey as RSAPrivateKey))
+        println("respondToken: $respondToken")
 
-        val status = HttpClient().use { client ->
+        /*val status = HttpClient().use { client ->
             client.post(
                 url {
                     protocol = URLProtocol.HTTPS
@@ -211,7 +210,7 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
                 }
             }
         }
-        println("status: $status")
+        println("status: $status")*/
         call.respondRedirect("redirect")
 
         // TO DO

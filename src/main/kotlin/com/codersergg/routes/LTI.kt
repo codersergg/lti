@@ -155,11 +155,11 @@ fun Route.authenticationResponsePost(
 
         val updatedState = authenticationData.getState(stateAuthResponse.toString())
         println("updatedState: $updatedState")
-        val lineitems = jsonPayload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]
-            ?.jsonObject?.get("lineitems").toString()
+        val lineitem = jsonPayload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]
+            ?.jsonObject?.get("lineitem").toString()
             .replace("\"", "")
             .replace("https://", "")
-        println("lineitems: $lineitems")
+        println("lineitem: $lineitem")
         authenticationData.putState(updatedState)
         println(updatedState)
 
@@ -185,12 +185,12 @@ fun Route.authenticationResponsePost(
             client.post(
                 url {
                     protocol = URLProtocol.HTTPS
-                    host = lineitems
+                    host = lineitem
                     parameters.append("JWT", respondToken)
                 }
             ) {
                 headers {
-                    append(HttpHeaders.Accept, "application/vnd.ims.lis.v2.lineitemcontainer+json")
+                    append(HttpHeaders.Accept, "application/vnd.ims.lis.v2.lineitem+json")
                     //append(HttpHeaders.Authorization, "abc123")
                 }
             }

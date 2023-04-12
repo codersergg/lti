@@ -169,7 +169,7 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         // Check exp
         // The current time MUST be before the time represented by the exp Claim
         // https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
-        
+
         // Check iat
         // The Tool MAY use the iat Claim to reject tokens that were issued too far away from the
         // current time, limiting the amount of time that it needs to store nonces used to prevent

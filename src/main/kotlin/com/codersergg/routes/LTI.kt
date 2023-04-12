@@ -114,33 +114,27 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         val header = String(Base64.getUrlDecoder().decode(chunks[0]))
         val payload = String(Base64.getUrlDecoder().decode(chunks[1]))
 
+
         val state = authenticationData.getState(stateAuthResponse.toString())
-        val nonce = state.nonce
-        val clientId = state.clientId
-        val endUserIdentifier = state.endUserIdentifier
-
         val jsonPayload: Map<String, JsonElement> = Json.parseToJsonElement(payload).jsonObject
-
         // Check nonce
-        if (!payload.contains("\"nonce\":\"$nonce\"")) {
+        val nonce = state.nonce
+        val jsonNonce = jsonPayload["nonce"]
+        if (jsonNonce != null && !jsonNonce.equals(nonce)) {
             call.respond(HttpStatusCode.Conflict, "Wrong nonce")
             return@post
         }
         // Check Client ID
-        if (!payload.contains("\"aud\":\"$clientId\"")) {
-            call.respond(HttpStatusCode.Conflict, "Wrong Client ID 1")
+        val clientId = state.clientId
+        val jsonClientId = jsonPayload["aud"]
+        if (jsonClientId != null && !jsonClientId.equals(clientId)) {
+            call.respond(HttpStatusCode.Conflict, "Wrong Client ID")
             return@post
         }
-        val jsonClientId = jsonPayload["aud"]
-        println("jsonClientId: $jsonClientId")
-        if (jsonClientId != null) {
-            if (jsonClientId.equals(clientId)) {
-                call.respond(HttpStatusCode.Conflict, "Wrong Client ID 2")
-                return@post
-            }
-        }
         // Check end User identifier
-        if (!payload.contains("\"sub\":\"$endUserIdentifier\"")) {
+        val endUserIdentifier = state.endUserIdentifier
+        val jsonEndUserIdentifier = jsonPayload["sub"]
+        if (jsonEndUserIdentifier != null && !jsonEndUserIdentifier.equals(endUserIdentifier)) {
             call.respond(HttpStatusCode.Conflict, "Wrong Users Identifier")
             return@post
         }

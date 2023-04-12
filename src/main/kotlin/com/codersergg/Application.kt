@@ -15,12 +15,14 @@ fun Application.module() {
     val initLoginDataSource = MemoryInitLoginDataSource()
     val testDataSource = MemoryTestDataSource()
     val authenticationData = MemoryAuthenticationData()
-    val jwkProvider = JwkProviderBuilder("http://0.0.0.0:8080/")
+    val issuer = environment.config.property("jwt.issuer").getString()
+    val privateKeyString = environment.config.property("jwt.privateKey").getString()
+    val jwkProvider = JwkProviderBuilder(issuer)
         .cached(10, 24, TimeUnit.HOURS)
         .rateLimited(10, 1, TimeUnit.MINUTES)
         .build()
 
     configureSerialization()
     configureMonitoring()
-    configureRouting(initLoginDataSource, testDataSource, authenticationData, jwkProvider)
+    configureRouting(initLoginDataSource, testDataSource, authenticationData, jwkProvider, privateKeyString)
 }

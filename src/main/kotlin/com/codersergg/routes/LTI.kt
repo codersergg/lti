@@ -155,7 +155,6 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         val status = HttpClient().use { client ->
             client.get(
                 url {
-                    protocol = URLProtocol.HTTPS
                     host = lineitems
                 }
             ) {

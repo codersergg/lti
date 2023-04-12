@@ -127,16 +127,14 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
             return@post
         }
         // Check Client ID
-        val jsonClientId = jsonPayload["aud"]
+        val jsonClientId = jsonPayload["aud"].toString()
         if (!payload.contains("\"aud\":\"$clientId\"")) {
             call.respond(HttpStatusCode.Conflict, "Wrong Client ID 1")
             return@post
         }
-        if (jsonClientId != null) {
-            if (!jsonClientId.equals(clientId)) {
-                call.respond(HttpStatusCode.Conflict, "Wrong Client ID 2")
-                return@post
-            }
+        if (jsonClientId != clientId) {
+            call.respond(HttpStatusCode.Conflict, "Wrong Client ID 2")
+            return@post
         }
         // Check end User identifier
         if (!payload.contains("\"sub\":\"$endUserIdentifier\"")) {

@@ -149,6 +149,7 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         println("payload: $payload")
 
         val lineitems = authenticationData.getState(stateAuthResponse).lineitems!!
+        println("lineitems: $lineitems")
         val status = HttpClient().use { client ->
             client.get(
                 url {

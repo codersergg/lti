@@ -118,9 +118,9 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         // Check nonce
         val nonce = state.nonce
         println(nonce)
-        val jsonNonce = jsonPayload["nonce"]
+        val jsonNonce = jsonPayload["nonce"].toString()
         println(jsonNonce)
-        if ((jsonNonce != null) && !jsonNonce.equals(nonce)) {
+        if (!jsonNonce.contains(nonce)) {
             call.respond(HttpStatusCode.Conflict, "Wrong nonce")
             return@post
         }
@@ -149,7 +149,7 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         // https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
 
         TODO()
-        // Check exp
+        // Check iat
         // The Tool MAY use the iat Claim to reject tokens that were issued too far away from the
         // current time, limiting the amount of time that it needs to store nonces used to prevent
         // attacks. The Tool MAY define its own acceptable time range

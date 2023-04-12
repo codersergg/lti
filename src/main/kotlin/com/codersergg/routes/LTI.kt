@@ -1,10 +1,14 @@
 package com.codersergg.routes
 
 import com.auth0.jwk.JwkProvider
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import com.codersergg.data.AuthenticationData
 import com.codersergg.data.InitLoginDataSource
 import com.codersergg.data.models.InitLogin
 import com.codersergg.data.models.State
+import io.ktor.client.*
+import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
@@ -18,6 +22,9 @@ import kotlinx.serialization.json.jsonObject
 import java.io.File
 import java.net.URLDecoder
 import java.security.KeyFactory
+import java.security.interfaces.RSAPrivateKey
+import java.security.interfaces.RSAPublicKey
+import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import java.util.*
 
@@ -160,7 +167,7 @@ fun Route.authenticationResponsePost(
         println("payload: $payload")
 
         val publicKey = jwkProvider.get("6f8856ed-9189-488f-9011-0ff4b6c08edc").publicKey
-        /*val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyString))
+        val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyString))
         val privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpecPKCS8)
 
         val respondToken = JWT.create()
@@ -171,9 +178,9 @@ fun Route.authenticationResponsePost(
             .withClaim("iat", jsonPayload["iat"].toString().replace("\"", ""))
             .withExpiresAt(Date(System.currentTimeMillis() + 60000))
             .sign(Algorithm.RSA256(publicKey as RSAPublicKey, privateKey as RSAPrivateKey))
-        println("respondToken: $respondToken")*/
+        println("respondToken: $respondToken")
 
-        /*val status = HttpClient().use { client ->
+        val status = HttpClient().use { client ->
             client.post(
                 url {
                     protocol = URLProtocol.HTTPS
@@ -187,7 +194,7 @@ fun Route.authenticationResponsePost(
                 }
             }
         }
-        println("status: $status")*/
+        println("status: $status")
         call.respondRedirect("redirect")
 
         // TO DO

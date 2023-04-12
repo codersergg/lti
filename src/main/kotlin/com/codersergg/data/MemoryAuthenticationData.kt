@@ -8,7 +8,7 @@ class MemoryAuthenticationData(private val map: MutableMap<String, State> = Hash
         return map[state]?.state.equals(state)
     }
 
-    override suspend fun getState(state: String): State {
+    override suspend fun getState(state: String?): State {
         return map[state]!!
     }
 

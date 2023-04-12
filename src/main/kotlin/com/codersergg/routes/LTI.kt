@@ -4,6 +4,8 @@ import com.codersergg.data.AuthenticationData
 import com.codersergg.data.InitLoginDataSource
 import com.codersergg.data.models.InitLogin
 import com.codersergg.data.models.State
+import io.ktor.client.*
+import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -138,24 +140,42 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
             call.respond(HttpStatusCode.Conflict, "Wrong Users Identifier")
             return@post
         }
+
+        val updatedState = authenticationData.getState(stateAuthResponse.toString())
+        updatedState.lineitems = jsonPayload["jsonPayload"]?.toString()
+        authenticationData.putState(updatedState)
+
         println("header: $header")
         println("payload: $payload")
 
+        val lineitems = authenticationData.getState(stateAuthResponse).lineitems!!
+        val status = HttpClient().use { client ->
+            client.get(
+                url {
+                    protocol = URLProtocol.HTTPS
+                    host = lineitems
+                }
+            ) {
+                headers {
+                    append(HttpHeaders.Accept, "application/vnd.ims.lis.v2.lineitem+json")
+                    //append(HttpHeaders.Authorization, "abc123")
+                }
+            }
+        }
+        println("status: $status")
         call.respondRedirect("redirect")
 
         TODO()
         // Check exp
         // The current time MUST be before the time represented by the exp Claim
         // https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
-
-        TODO()
+        
         // Check iat
         // The Tool MAY use the iat Claim to reject tokens that were issued too far away from the
         // current time, limiting the amount of time that it needs to store nonces used to prevent
         // attacks. The Tool MAY define its own acceptable time range
         // https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
 
-        TODO()
         // Check token
         // The Tool MUST Validate the signature of the ID Token according to JSON Web
         // Signature [RFC7515], Section 5.2 using the Public Key from the Platform
@@ -164,13 +184,23 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
     }
 }
 
-fun Route.redirectGet() {
+fun Route.redirect() {
     get("redirect") {
         // get the interactive from the repository
         val interactive = "src/main/resources/static/my_interactive_picture.html"
         call.respondFile(File(interactive))
     }
 }
+
+/*fun Route.grade(authenticationData: AuthenticationData) {
+    get("grade") {
+        val status = HttpClient().use { client ->
+            client.get(
+                authenticationData.getState()
+            )
+        }
+    }
+}*/
 
 fun Route.getPublicKey() {
     get("public-key") {

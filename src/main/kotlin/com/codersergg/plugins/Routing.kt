@@ -22,7 +22,7 @@ fun Application.configureRouting(
         getSizeTestRequest(testDataSource)
         getAllReceiveText(testDataSource)
         authenticationResponsePost(authenticationData)
-        redirectGet()
+        redirect()
         getPublicKey()
         getPublicKeyPost()
     }

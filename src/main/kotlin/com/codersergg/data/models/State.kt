@@ -5,4 +5,5 @@ data class State(
     val nonce: String,
     val clientId: String,
     val endUserIdentifier: String,
+    var lineitems: String? = null
 )

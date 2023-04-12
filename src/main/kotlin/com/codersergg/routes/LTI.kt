@@ -26,6 +26,8 @@ import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 fun Route.initiateLogin(
@@ -172,11 +174,11 @@ fun Route.authenticationResponsePost(
         val privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpecPKCS8)
 
         val respondToken = JWT.create()
-            .withClaim("iss", jsonPayload["iss"].toString().replace("\"", ""))
-            .withClaim("aud", jsonClientId.replace("\"", ""))
+            .withClaim("iss", "914tL6Nm7c7Kba7")
+            .withClaim("aud", "https://lti-test-connect.moodlecloud.com")
             .withClaim("nonce", jsonNonce.replace("\"", ""))
-            .withClaim("exp", jsonPayload["exp"].toString().replace("\"", ""))
-            .withClaim("iat", jsonPayload["iat"].toString().replace("\"", ""))
+            .withClaim("exp", DateTimeFormatter.ISO_INSTANT.format(Instant.now()) + 60 * 10)
+            .withClaim("iat", DateTimeFormatter.ISO_INSTANT.format(Instant.now()))
             .withExpiresAt(Date(System.currentTimeMillis() + 60000))
             .sign(Algorithm.RSA256(publicKey as RSAPublicKey, privateKey as RSAPrivateKey))
         println("respondToken: $respondToken")

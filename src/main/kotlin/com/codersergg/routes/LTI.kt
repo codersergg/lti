@@ -141,8 +141,10 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
 
         val updatedState = authenticationData.getState(stateAuthResponse.toString())
         println("updatedState: $updatedState")
-        val jsonElement = jsonPayload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]
-        println("https://purl.imsglobal.org/spec/lti-ags/claim/endpoint: $jsonElement")
+        val jsonElement = jsonPayload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]?.jsonObject
+        val jsonElement1 = jsonElement?.get("lineitems")
+        println("https://purl.imsglobal.org/spec/lti-ags/claim/endpoint: $jsonElement1")
+        println("lineitems: $jsonElement")
         authenticationData.putState(updatedState)
         println(updatedState)
 

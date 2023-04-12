@@ -1,5 +1,8 @@
 package com.codersergg.routes
 
+import com.auth0.jwk.JwkProviderBuilder
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import com.codersergg.data.AuthenticationData
 import com.codersergg.data.InitLoginDataSource
 import com.codersergg.data.models.InitLogin
@@ -18,8 +21,12 @@ import kotlinx.serialization.json.jsonObject
 import java.io.File
 import java.net.URLDecoder
 import java.security.KeyFactory
+import java.security.interfaces.RSAPrivateKey
+import java.security.interfaces.RSAPublicKey
+import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 fun Route.initiateLogin(
     initLoginDataSource: InitLoginDataSource,
@@ -71,7 +78,8 @@ fun Route.initiateLogin(
                 state = state,
                 nonce = nonce,
                 clientId = clientId.toString(),
-                endUserIdentifier = endUserIdentifier
+                endUserIdentifier = endUserIdentifier,
+                iss = findParameterValue(request, "iss")!!
             )
         )
         val url = url {
@@ -154,11 +162,47 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         println("header: $header")
         println("payload: $payload")
 
+        val issuer = "http://0.0.0.0:8080/"
+        val jwkProvider = JwkProviderBuilder(issuer)
+            .cached(10, 24, TimeUnit.HOURS)
+            .rateLimited(10, 1, TimeUnit.MINUTES)
+            .build()
+        val publicKey = jwkProvider.get("6f8856ed-9189-488f-9011-0ff4b6c08edc").publicKey
+        val keySpecPKCS8 = PKCS8EncodedKeySpec(
+            Base64.getDecoder().decode(
+                "MIICXQIBAAKBgQCqV/rzIE5bnDybxYWuVlHWoAHVy5K2m8B36RnfkjIe8zMTGkwB\n" +
+                        "                  Rc7BwOYC1MqW1P+MrtcA8JQVxwsWhJ9/po8gwuB9Tlmdz58UoTRyPaVI71xNYeVm\n" +
+                        "                  wpKl0xOGlibyfnb/JgojseAKAGLGyPhVnvbCdWEP9O7BIJjQ2boxcDtO0wIDAQAB\n" +
+                        "                  AoGAWZ17ilieoJdrU0/w6izDVTRMgttcTfFWqj7Zu8K/14R+hDg7cBf3k/sVhrvH\n" +
+                        "                  8N4Rq0N4HShz35kdfjU7a/6GIQgMNBTDBEE1suUaC3COntCgWH29UMcuYm9+JGK7\n" +
+                        "                  uECkyVBZ5OTFetcRfmBIGeo/+/Ahm4zbmVS4ZkJva10r5xECQQD+2w5MM/oGT9Ja\n" +
+                        "                  kxTafNTKyjEM3nyutrEjix14nggPxR81BbYIuZ5RurxJaAbsla/Vxa6IlcEd5D1x\n" +
+                        "                  k/XMF3xnAkEAqxvIMMw4WDZD9n4TugP4xjR1PR6vecBpbD40sC2j2PBwN1LEmlOz\n" +
+                        "                  iZ4vSJXUhdg6Z+hlMRKUZ50Lyjx+o+SWtQJBAL2SWk9Ktmdthq5DC9b91hdGUTge\n" +
+                        "                  YyZe1OL4fyKSgrKgUXdSWTaiQ+bNfXMpA0WGjrX4BryokG7YsO/EPKjkq28CQGoR\n" +
+                        "                  CbJ+FXtRACYfFzla1u5+fCJMEDhntrH7iYugbw2+VcFllCuaMRPgs6zJ+/iQBfx9\n" +
+                        "                  SaT2wHnOFw3hHBuaSnUCQQCl5vHkU8LI9RIPf9dd9HNNFIud+Q7JUys7mXcY0xiB\n" +
+                        "                  F1y9gFe8KIqeWstbkRTAS9QAxG1Xb6kr04iGJ9WpAADi"
+            )
+        )
+        val privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpecPKCS8)
+        val respondToken = JWT.create()
+            //.withAudience("http://0.0.0.0:8080/hello")
+            //.withIssuer(issuer)
+            .withClaim("iss", jsonPayload["iss"].toString().replace("\"", ""))
+            .withClaim("aud", jsonClientId.replace("\"", ""))
+            .withClaim("nonce", jsonNonce.replace("\"", ""))
+            .withClaim("exp", jsonPayload["exp"].toString().replace("\"", ""))
+            .withClaim("iat", jsonPayload["iat"].toString().replace("\"", ""))
+            .withExpiresAt(Date(System.currentTimeMillis() + 60000))
+            .sign(Algorithm.RSA256(publicKey as RSAPublicKey, privateKey as RSAPrivateKey))
+
         val status = HttpClient().use { client ->
-            client.get(
+            client.post(
                 url {
                     protocol = URLProtocol.HTTPS
                     host = lineitems
+                    parameters.append("JWT", respondToken)
                 }
             ) {
                 headers {

@@ -101,40 +101,38 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
     post("authentication-response") {
         val receiveText = call.receiveText()
 
-        val token = findParameterValue(receiveText, "id_token")
-        val stateAuthResponse = findParameterValue(receiveText, "state")
-
         // Check State
-        if (!authenticationData.isCorrectState(stateAuthResponse.toString())) {
+        val stateAuthResponse = findParameterValue(receiveText, "state")
+        val state = authenticationData.getState(stateAuthResponse.toString())
+        if (!stateAuthResponse.equals(state.state)) {
             call.respond(HttpStatusCode.Conflict, "Wrong state")
             return@post
         }
 
+        val token = findParameterValue(receiveText, "id_token")
         val chunks = token!!.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         val header = String(Base64.getUrlDecoder().decode(chunks[0]))
         val payload = String(Base64.getUrlDecoder().decode(chunks[1]))
-
-
-        val state = authenticationData.getState(stateAuthResponse.toString())
         val jsonPayload: Map<String, JsonElement> = Json.parseToJsonElement(payload).jsonObject
+
         // Check nonce
         val nonce = state.nonce
         val jsonNonce = jsonPayload["nonce"]
-        if (jsonNonce != null && !jsonNonce.equals(nonce)) {
+        if ((jsonNonce != null) && !jsonNonce.equals(nonce)) {
             call.respond(HttpStatusCode.Conflict, "Wrong nonce")
             return@post
         }
         // Check Client ID
         val clientId = state.clientId
         val jsonClientId = jsonPayload["aud"]
-        if (jsonClientId != null && !jsonClientId.equals(clientId)) {
+        if ((jsonClientId != null) && !jsonClientId.equals(clientId)) {
             call.respond(HttpStatusCode.Conflict, "Wrong Client ID")
             return@post
         }
         // Check end User identifier
         val endUserIdentifier = state.endUserIdentifier
         val jsonEndUserIdentifier = jsonPayload["sub"]
-        if (jsonEndUserIdentifier != null && !jsonEndUserIdentifier.equals(endUserIdentifier)) {
+        if ((jsonEndUserIdentifier != null) && !jsonEndUserIdentifier.equals(endUserIdentifier)) {
             call.respond(HttpStatusCode.Conflict, "Wrong Users Identifier")
             return@post
         }

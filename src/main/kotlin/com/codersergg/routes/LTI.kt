@@ -10,6 +10,9 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonObject
 import java.io.File
 import java.net.URLDecoder
 import java.security.KeyFactory
@@ -21,8 +24,8 @@ fun Route.initiateLogin(
     authenticationData: AuthenticationData
 ) {
     post("initiate-login") {
-        // SECRET key Moodle: save in DB or EV
-        //val SECRET = "qwasrffvw4531r"
+
+        // Индивидуальные параметры площадки
 
         // url запроса аутентификации в LMS, смотреть в настройках LMS
         val authUrl = "lti-test-connect.moodlecloud.com/mod/lti/auth.php"
@@ -37,13 +40,15 @@ fun Route.initiateLogin(
             return@post
         }
 
+        val clientId = findParameterValue(request, "client_id")
+        val endUserIdentifier = findParameterValue(request, "login_hint")
         val initLogin = InitLogin(
             iss = findParameterValue(request, "iss")!!,
-            login_hint = findParameterValue(request, "login_hint")!!,
+            login_hint = endUserIdentifier!!,
             target_link_uri = findParameterValue(request, "target_link_uri")!!,
             lti_message_hint = findParameterValue(request, "lti_message_hint"),
             lti_deployment_id = findParameterValue(request, "lti_deployment_id"),
-            client_id = findParameterValue(request, "client_id")
+            client_id = clientId
         )
 
         initLoginDataSource.putByLoginHint(initLogin)
@@ -59,7 +64,14 @@ fun Route.initiateLogin(
 
         val state = UUID.randomUUID().toString()
         val nonce = UUID.randomUUID().toString()
-        authenticationData.putState(State(state = state, nonce = nonce))
+        authenticationData.putState(
+            State(
+                state = state,
+                nonce = nonce,
+                clientId = clientId.toString(),
+                endUserIdentifier = endUserIdentifier
+            )
+        )
         val url = url {
             protocol = URLProtocol.HTTPS
             host = authUrl
@@ -90,8 +102,10 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         val receiveText = call.receiveText()
 
         val token = findParameterValue(receiveText, "id_token")
-        val state = findParameterValue(receiveText, "state")
-        if (!authenticationData.isCorrectState(state.toString())) {
+        val stateAuthResponse = findParameterValue(receiveText, "state")
+
+        // Check State
+        if (!authenticationData.isCorrectState(stateAuthResponse.toString())) {
             call.respond(HttpStatusCode.Conflict, "Wrong state")
             return@post
         }
@@ -100,10 +114,33 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         val header = String(Base64.getUrlDecoder().decode(chunks[0]))
         val payload = String(Base64.getUrlDecoder().decode(chunks[1]))
 
-        val nonce = authenticationData.getNonce(state.toString())
+        val state = authenticationData.getState(stateAuthResponse.toString())
+        val nonce = state.nonce
+        val clientId = state.clientId
+        val endUserIdentifier = state.endUserIdentifier
 
+        val jsonPayload: Map<String, JsonElement> = Json.parseToJsonElement(payload).jsonObject
+
+        // Check nonce
         if (!payload.contains("\"nonce\":\"$nonce\"")) {
             call.respond(HttpStatusCode.Conflict, "Wrong nonce")
+            return@post
+        }
+        // Check Client ID
+        val jsonClientId = jsonPayload["aud"]
+        if (!payload.contains("\"aud\":\"$clientId\"")) {
+            call.respond(HttpStatusCode.Conflict, "Wrong Client ID 1")
+            return@post
+        }
+        if (jsonClientId != null) {
+            if (!jsonClientId.equals(clientId)) {
+                call.respond(HttpStatusCode.Conflict, "Wrong Client ID 2")
+                return@post
+            }
+        }
+        // Check end User identifier
+        if (!payload.contains("\"sub\":\"$endUserIdentifier\"")) {
+            call.respond(HttpStatusCode.Conflict, "Wrong Users Identifier")
             return@post
         }
 

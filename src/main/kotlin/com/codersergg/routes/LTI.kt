@@ -1,8 +1,6 @@
 package com.codersergg.routes
 
 import com.auth0.jwk.JwkProvider
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 import com.codersergg.data.AuthenticationData
 import com.codersergg.data.InitLoginDataSource
 import com.codersergg.data.models.InitLogin
@@ -20,9 +18,6 @@ import kotlinx.serialization.json.jsonObject
 import java.io.File
 import java.net.URLDecoder
 import java.security.KeyFactory
-import java.security.interfaces.RSAPrivateKey
-import java.security.interfaces.RSAPublicKey
-import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import java.util.*
 
@@ -164,7 +159,7 @@ fun Route.authenticationResponsePost(
         println("header: $header")
         println("payload: $payload")
 
-        val publicKey = jwkProvider.get("6f8856ed-9189-488f-9011-0ff4b6c08edc").publicKey
+        /*val publicKey = jwkProvider.get("6f8856ed-9189-488f-9011-0ff4b6c08edc").publicKey
         val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyString))
         val privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpecPKCS8)
 
@@ -176,7 +171,7 @@ fun Route.authenticationResponsePost(
             .withClaim("iat", jsonPayload["iat"].toString().replace("\"", ""))
             .withExpiresAt(Date(System.currentTimeMillis() + 60000))
             .sign(Algorithm.RSA256(publicKey as RSAPublicKey, privateKey as RSAPrivateKey))
-        println("respondToken: $respondToken")
+        println("respondToken: $respondToken")*/
 
         /*val status = HttpClient().use { client ->
             client.post(

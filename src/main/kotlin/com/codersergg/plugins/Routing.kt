@@ -1,5 +1,6 @@
 package com.codersergg.plugins
 
+import com.auth0.jwk.JwkProvider
 import com.codersergg.data.AuthenticationData
 import com.codersergg.data.InitLoginDataSource
 import com.codersergg.data.TestDataSource
@@ -10,7 +11,8 @@ import io.ktor.server.routing.*
 fun Application.configureRouting(
     initLoginDataSource: InitLoginDataSource,
     testDataSource: TestDataSource,
-    authenticationData: AuthenticationData
+    authenticationData: AuthenticationData,
+    jwkProvider: JwkProvider
 ) {
 
     routing {
@@ -21,7 +23,7 @@ fun Application.configureRouting(
         getAllEncoding(testDataSource)
         getSizeTestRequest(testDataSource)
         getAllReceiveText(testDataSource)
-        authenticationResponsePost(authenticationData)
+        authenticationResponsePost(authenticationData, jwkProvider)
         redirect()
         getPublicKey()
         getPublicKeyPost()

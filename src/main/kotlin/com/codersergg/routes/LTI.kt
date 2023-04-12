@@ -1,6 +1,6 @@
 package com.codersergg.routes
 
-import com.auth0.jwk.JwkProviderBuilder
+import com.auth0.jwk.JwkProvider
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.codersergg.data.AuthenticationData
@@ -9,7 +9,6 @@ import com.codersergg.data.models.InitLogin
 import com.codersergg.data.models.State
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.http.content.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -25,7 +24,6 @@ import java.security.interfaces.RSAPublicKey
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 fun Route.initiateLogin(
     initLoginDataSource: InitLoginDataSource,
@@ -106,7 +104,10 @@ fun Route.initiateLogin(
     }
 }
 
-fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
+fun Route.authenticationResponsePost(
+    authenticationData: AuthenticationData,
+    jwkProvider: JwkProvider
+) {
     post("authentication-response") {
         val receiveText = call.receiveText()
 
@@ -161,11 +162,11 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         println("header: $header")
         println("payload: $payload")
 
-        val issuer = "http://0.0.0.0:8080/"
+        /*val issuer = "http://0.0.0.0:8080/"
         val jwkProvider = JwkProviderBuilder(issuer)
             .cached(10, 24, TimeUnit.HOURS)
             .rateLimited(10, 1, TimeUnit.MINUTES)
-            .build()
+            .build()*/
         val publicKey = jwkProvider.get("6f8856ed-9189-488f-9011-0ff4b6c08edc").publicKey
         val keySpecPKCS8 = PKCS8EncodedKeySpec(
             Base64.getDecoder().decode(
@@ -186,8 +187,6 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         )
         val privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpecPKCS8)
         val respondToken = JWT.create()
-            //.withAudience("http://0.0.0.0:8080/hello")
-            //.withIssuer(issuer)
             .withClaim("iss", jsonPayload["iss"].toString().replace("\"", ""))
             .withClaim("aud", jsonClientId.replace("\"", ""))
             .withClaim("nonce", jsonNonce.replace("\"", ""))
@@ -252,9 +251,8 @@ fun Route.redirect() {
 }*/
 
 fun Route.cert() {
-    static(".well-known") {
-        staticRootFolder = File("certs")
-        file("jwks.json")
+    get(".well-known") {
+        call.respondFile(File("src/main/resources/static/jwks.json"))
     }
 }
 

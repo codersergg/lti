@@ -140,16 +140,15 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         }
 
         val updatedState = authenticationData.getState(stateAuthResponse.toString())
-        val jsonElement = jsonPayload["jsonPayload"]
-        println("jsonElement $jsonElement")
+        println("updatedState: $updatedState")
+        val jsonElement = jsonPayload["lineitems"]
+        println("lineitems $jsonElement")
         authenticationData.putState(updatedState)
         println(updatedState)
 
         println("header: $header")
         println("payload: $payload")
 
-        val lineitems = authenticationData.getState(stateAuthResponse).lineitems!!
-        println("lineitems: $lineitems")
         /*val status = HttpClient().use { client ->
             client.get(
                 url {

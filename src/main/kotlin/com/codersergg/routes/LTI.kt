@@ -140,7 +140,8 @@ fun Route.authenticationResponsePost(authenticationData: AuthenticationData) {
         }
 
         val updatedState = authenticationData.getState(stateAuthResponse.toString())
-        updatedState.lineitems = jsonPayload["jsonPayload"]?.toString()
+        val jsonElement = jsonPayload["jsonPayload"]
+        println("jsonElement $jsonElement")
         authenticationData.putState(updatedState)
         println(updatedState)
 

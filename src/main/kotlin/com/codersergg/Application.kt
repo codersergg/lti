@@ -17,6 +17,7 @@ fun Application.module() {
     val authenticationData = MemoryAuthenticationData()
     val issuer = environment.config.property("jwt.issuer").getString()
     val privateKeyString = environment.config.property("jwt.privateKey").getString()
+
     val jwkProvider = JwkProviderBuilder(issuer)
         .cached(10, 24, TimeUnit.HOURS)
         .rateLimited(10, 1, TimeUnit.MINUTES)

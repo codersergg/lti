@@ -25,7 +25,6 @@ import java.security.KeyFactory
 import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
 import java.security.spec.PKCS8EncodedKeySpec
-import java.security.spec.X509EncodedKeySpec
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -249,44 +248,6 @@ fun Route.redirect() {
         // get the interactive from the repository
         val interactive = "src/main/resources/static/my_interactive_picture.html"
         call.respondFile(File(interactive))
-    }
-}
-
-/*fun Route.grade(authenticationData: AuthenticationData) {
-    get("grade") {
-        val status = HttpClient().use { client ->
-            client.get(
-                authenticationData.getState()
-            )
-        }
-    }
-}*/
-
-fun Route.getPublicKey() {
-    get("public-key") {
-        val data: ByteArray = Base64.getDecoder()
-            .decode("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDR3WR47goUtiHKHPnlLTzS5YY2V4Kj4stKO+OLBv5QVnWMhWplXBAbdvBMTMTLbM51ay0Pb8+ldXkzXMLLsIyHx3j6eFZ3nYp3O1OAo6poQmPrWWm/eIroCQy34eiW3+2g0XMLs21CuNVUMA1kHMOc3ICBNJ43091Cx/4anEq2vQIDAQAB".toByteArray())
-        val spec = X509EncodedKeySpec(data)
-        val fact = KeyFactory.getInstance("RSA")
-
-        val publicKey = fact.generatePublic(spec)
-        println("publicKey:$publicKey")
-
-        call.respond(publicKey.toString())
-    }
-}
-
-fun Route.getPublicKeyPost() {
-    post("public-key") {
-        val data: ByteArray = Base64.getDecoder()
-            .decode("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDR3WR47goUtiHKHPnlLTzS5YY2V4Kj4stKO+OLBv5QVnWMhWplXBAbdvBMTMTLbM51ay0Pb8+ldXkzXMLLsIyHx3j6eFZ3nYp3O1OAo6poQmPrWWm/eIroCQy34eiW3+2g0XMLs21CuNVUMA1kHMOc3ICBNJ43091Cx/4anEq2vQIDAQAB".toByteArray())
-        val spec = X509EncodedKeySpec(data)
-        val fact = KeyFactory.getInstance("RSA")
-
-        val publicKey = fact.generatePublic(spec)
-        println("publicKey:$publicKey")
-
-        call.respond(publicKey.toString())
     }
 }
 

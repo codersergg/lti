@@ -155,50 +155,15 @@ fun Route.authenticationResponsePost(
             return@post
         }
 
-        val updatedState = authenticationData.getState(stateAuthResponse.toString())
-        println("updatedState: $updatedState")
-        val lineitem = jsonPayload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]
-            ?.jsonObject?.get("lineitems").toString()
-            .replace("\"", "")
-            .replace("https://", "")
-        println("lineitem: $lineitem")
-        authenticationData.putState(updatedState)
-        println(updatedState)
-
-        println("header: $header")
-        println("payload: $payload")
-
-        val publicKey = jwkProvider.get("6f8856ed-9189-488f-9011-0ff4b6c08edc").publicKey
-        println("publicKey: ${publicKey.encoded}")
-        // https://stackoverflow.com/questions/6559272/algid-parse-error-not-a-sequence
-        val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode("MIIBVQIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEAtfJaLrzXILUg1U3N1KV8yJr92GHn5OtYZR7qWk1Mc4cy4JGjklYup7weMjBD9f3bBVoIsiUVX6xNcYIr0Ie0AQIDAQABAkEAg+FBquToDeYcAWBe1EaLVyC45HG60zwfG1S4S3IB+y4INz1FHuZppDjBh09jptQNd+kSMlG1LkAc/3znKTPJ7QIhANpyB0OfTK44lpH4ScJmCxjZV52mIrQcmnS3QzkxWQCDAiEA1Tn7qyoh+0rOO/9vJHP8U/beo51SiQMw0880a1UaiisCIQDNwY46EbhGeiLJR1cidr+JHl86rRwPDsolmeEF5AdzRQIgK3KXL3d0WSoS//K6iOkBX3KMRzaFXNnDl0U/XyeGMuUCIHaXv+n+Brz5BDnRbWS+2vkgIe9bUNlkiArpjWvX+2we"))
-        val privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpecPKCS8)
-
-        val respondToken = JWT.create()
-            .withClaim("iss", "914tL6Nm7c7Kba7")
-            .withClaim("aud", "https://lti-test-connect.moodlecloud.com")
-            .withClaim("nonce", jsonNonce.replace("\"", ""))
-            .withClaim("exp", DateTimeFormatter.ISO_INSTANT.format(Instant.now()) + 60 * 10)
-            .withClaim("iat", DateTimeFormatter.ISO_INSTANT.format(Instant.now()))
-            .withExpiresAt(Date(System.currentTimeMillis() + 60000))
-            .sign(Algorithm.RSA256(publicKey as RSAPublicKey, privateKey as RSAPrivateKey))
-        println("respondToken: $respondToken")
-
-        val status = HttpClient().use { client ->
-            client.post(
-                url {
-                    protocol = URLProtocol.HTTPS
-                    host = lineitem + "?tag=grade"
-                    parameters.append("JWT", respondToken)
-                }
-            ) {
-                headers {
-                    append(HttpHeaders.Accept, "application/vnd.ims.lis.v2.lineitemcontainer+json")
-                    //append(HttpHeaders.Authorization, "abc123")
-                }
-            }
-        }
-        println("status: $status")
+        getGrade(
+            authenticationData,
+            stateAuthResponse,
+            jsonPayload,
+            header,
+            payload,
+            jwkProvider,
+            jsonNonce
+        )
         call.respondRedirect("redirect")
 
         // TO DO
@@ -221,6 +186,64 @@ fun Route.authenticationResponsePost(
         staticRootFolder = File("certs")
         file("jwks.json")
     }
+}
+
+private suspend fun getGrade(
+    authenticationData: AuthenticationData,
+    stateAuthResponse: String?,
+    jsonPayload: Map<String, JsonElement>,
+    header: String,
+    payload: String,
+    jwkProvider: JwkProvider,
+    jsonNonce: String
+) {
+    val updatedState = authenticationData.getState(stateAuthResponse.toString())
+    println("updatedState: $updatedState")
+    val lineitem = jsonPayload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]
+        ?.jsonObject?.get("lineitem").toString()
+        .replace("\"", "")
+        .replace("https://", "")
+    println("lineitem: $lineitem")
+    authenticationData.putState(updatedState)
+    println(updatedState)
+
+    println("header: $header")
+    println("payload: $payload")
+
+    val publicKey = jwkProvider.get("6f8856ed-9189-488f-9011-0ff4b6c08edc").publicKey
+    println("publicKey: ${publicKey.encoded}")
+    // https://stackoverflow.com/questions/6559272/algid-parse-error-not-a-sequence
+    val keySpecPKCS8 = PKCS8EncodedKeySpec(
+        Base64.getDecoder()
+            .decode("MIIBVQIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEAtfJaLrzXILUg1U3N1KV8yJr92GHn5OtYZR7qWk1Mc4cy4JGjklYup7weMjBD9f3bBVoIsiUVX6xNcYIr0Ie0AQIDAQABAkEAg+FBquToDeYcAWBe1EaLVyC45HG60zwfG1S4S3IB+y4INz1FHuZppDjBh09jptQNd+kSMlG1LkAc/3znKTPJ7QIhANpyB0OfTK44lpH4ScJmCxjZV52mIrQcmnS3QzkxWQCDAiEA1Tn7qyoh+0rOO/9vJHP8U/beo51SiQMw0880a1UaiisCIQDNwY46EbhGeiLJR1cidr+JHl86rRwPDsolmeEF5AdzRQIgK3KXL3d0WSoS//K6iOkBX3KMRzaFXNnDl0U/XyeGMuUCIHaXv+n+Brz5BDnRbWS+2vkgIe9bUNlkiArpjWvX+2we")
+    )
+    val privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpecPKCS8)
+
+    val respondToken = JWT.create()
+        .withClaim("iss", "914tL6Nm7c7Kba7")
+        .withClaim("aud", "https://lti-test-connect.moodlecloud.com")
+        .withClaim("nonce", jsonNonce.replace("\"", ""))
+        .withClaim("exp", DateTimeFormatter.ISO_INSTANT.format(Instant.now()) + 60 * 10)
+        .withClaim("iat", DateTimeFormatter.ISO_INSTANT.format(Instant.now()))
+        .withExpiresAt(Date(System.currentTimeMillis() + 60000))
+        .sign(Algorithm.RSA256(publicKey as RSAPublicKey, privateKey as RSAPrivateKey))
+    println("respondToken: $respondToken")
+
+    val status = HttpClient().use { client ->
+        client.post(
+            url {
+                protocol = URLProtocol.HTTPS
+                host = lineitem
+                //parameters.append("JWT", respondToken)
+            }
+        ) {
+            headers {
+                append(HttpHeaders.Accept, "application/vnd.ims.lis.v2.lineitem+json")
+                //append(HttpHeaders.Authorization, "abc123")
+            }
+        }
+    }
+    println("status: $status")
 }
 
 fun Route.redirect() {

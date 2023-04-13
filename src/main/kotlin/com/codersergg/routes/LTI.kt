@@ -235,7 +235,7 @@ private suspend fun getGrade(
         ) {
             headers {
                 append(HttpHeaders.Accept, "application/vnd.ims.lis.v2.lineitem+json")
-                //append(HttpHeaders.Authorization, "abc123")
+                append(HttpHeaders.Authorization, "Bearer $respondToken")
             }
         }
     }

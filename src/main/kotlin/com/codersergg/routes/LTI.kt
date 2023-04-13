@@ -155,12 +155,13 @@ fun Route.authenticationResponsePost(
             return@post
         }
 
+        println("header: $header")
+        println("payload: $payload")
+
         getGrade(
             authenticationData,
             stateAuthResponse,
             jsonPayload,
-            header,
-            payload,
             jwkProvider,
             jsonNonce
         )
@@ -192,8 +193,6 @@ private suspend fun getGrade(
     authenticationData: AuthenticationData,
     stateAuthResponse: String?,
     jsonPayload: Map<String, JsonElement>,
-    header: String,
-    payload: String,
     jwkProvider: JwkProvider,
     jsonNonce: String
 ) {
@@ -206,9 +205,6 @@ private suspend fun getGrade(
     println("lineitem: $lineitem")
     authenticationData.putState(updatedState)
     println(updatedState)
-
-    println("header: $header")
-    println("payload: $payload")
 
     val publicKey = jwkProvider.get("6f8856ed-9189-488f-9011-0ff4b6c08edc").publicKey
     println("publicKey: ${publicKey.encoded}")
@@ -224,13 +220,13 @@ private suspend fun getGrade(
         .withClaim("aud", "https://lti-test-connect.moodlecloud.com")
         .withClaim("nonce", jsonNonce.replace("\"", ""))
         .withClaim("exp", DateTimeFormatter.ISO_INSTANT.format(Instant.now()) + 60 * 10)
-        .withClaim("iat", DateTimeFormatter.ISO_INSTANT.format(Instant.now()))
+        .withClaim("iat", DateTimeFormatter.ISO_INSTANT.format(Instant.now()) + 1)
         .withExpiresAt(Date(System.currentTimeMillis() + 60000))
         .sign(Algorithm.RSA256(publicKey as RSAPublicKey, privateKey as RSAPrivateKey))
     println("respondToken: $respondToken")
 
     val status = HttpClient().use { client ->
-        client.post(
+        client.get(
             url {
                 protocol = URLProtocol.HTTPS
                 host = lineitem

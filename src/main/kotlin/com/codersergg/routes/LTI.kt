@@ -187,7 +187,7 @@ fun Route.authenticationResponsePost(
             client.post(
                 url {
                     protocol = URLProtocol.HTTPS
-                    host = lineitem + "?tag=\"grade\""
+                    host = lineitem + "?tag=grade"
                     parameters.append("JWT", respondToken)
                 }
             ) {

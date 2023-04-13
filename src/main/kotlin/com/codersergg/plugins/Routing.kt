@@ -26,8 +26,6 @@ fun Application.configureRouting(
         getAllReceiveText(testDataSource)
         authenticationResponsePost(authenticationData, jwkProvider, privateKeyString)
         redirect()
-        getPublicKey()
-        getPublicKeyPost()
     }
 
 }

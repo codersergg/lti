@@ -41,6 +41,7 @@ fun Route.initiateLogin(
         val authUrl = "lti-test-connect.moodlecloud.com/mod/lti/auth.php"
 
         val request = call.receiveText()
+        println("request $request")
         val isFieldsBlank = !request.contains("iss") ||
                 !request.contains("login_hint") ||
                 !request.contains("target_link_uri")
@@ -208,12 +209,8 @@ private suspend fun getGrade(
     println(updatedState)
 
     val publicKey = jwkProvider.get("6f8856ed-9189-488f-9011-0ff4b6c08edc").publicKey
-    println("publicKey: ${publicKey.encoded}")
     // https://stackoverflow.com/questions/6559272/algid-parse-error-not-a-sequence
-    val keySpecPKCS8 = PKCS8EncodedKeySpec(
-        Base64.getDecoder()
-            .decode(privateKeyString)
-    )
+    val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyString))
     val privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpecPKCS8)
 
     val respondToken = JWT.create()
@@ -231,7 +228,6 @@ private suspend fun getGrade(
             url {
                 protocol = URLProtocol.HTTPS
                 host = lineitem
-                //parameters.append("JWT", respondToken)
             }
         ) {
             headers {

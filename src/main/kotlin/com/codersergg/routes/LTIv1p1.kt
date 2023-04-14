@@ -40,8 +40,9 @@ fun Route.initiateLoginV1p1(
         // url запроса аутентификации в LMS, смотреть в настройках LMS
         val authUrl = "lti-test-connect.moodlecloud.com/mod/lti/auth.php"
 
-        val ltiVersion = call.request.queryParameters["lti_version"]
-        if (ltiVersion?.isNotEmpty() == true) {
+        val formParameters = call.receiveParameters()
+        val ltiVersion = formParameters["lti_version"].toString()
+        if (ltiVersion.isNotEmpty()) {
             println("ltiVersion: $ltiVersion")
         } else {
             println("LTI Version is Empty")

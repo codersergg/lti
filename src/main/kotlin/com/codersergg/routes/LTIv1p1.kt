@@ -77,17 +77,16 @@ suspend fun garde(parameters: Parameters): HttpResponse {
     </imsx_POXEnvelopeRequest>
 """.trimIndent()
 
-    val status = HttpClient() {
+    val status = HttpClient {
         install(ContentNegotiation) {
             xml()
         }
     }.use { client ->
         client.post(parameters["lis_outcome_service_url"].toString()) {
             contentType(ContentType.Application.Xml)
-            //setBody(InitLogin("3", "Jet", "Brains"))
             setBody(xmlStr)
         }
-    }
+    }.call.response
     println("status: $status")
     return status
 }

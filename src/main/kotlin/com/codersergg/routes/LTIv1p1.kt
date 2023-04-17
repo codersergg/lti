@@ -4,8 +4,11 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
+import org.apache.commons.codec.binary.Hex
 import java.security.KeyFactory
+import java.security.PublicKey
 import java.security.Signature
+import java.security.spec.EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import java.util.*
 
@@ -28,21 +31,23 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
     }
 
     println(parameters.toString())
-    val signature = parameters["oauth_signature"]
+    val sig = parameters["oauth_signature"]
     val publicKey = parameters["oauth_consumer_key"]
     val signatureMethod = parameters["oauth_signature_method"]
-    println(signature)
+    println(sig)
 
-    val publicBytes: ByteArray = Base64.getDecoder().decode(publicKey)
-    val keySpec = X509EncodedKeySpec(publicBytes)
-    val keyFactory = KeyFactory.getInstance(signatureMethod)
-    val pubKey = keyFactory.generatePublic(keySpec)
+    // verify
+    val mySig = Signature.getInstance("NONEwithRSA")
+    mySig.initVerify(pubKeyFromString(publicKey))
+    val isSigValid = mySig.verify(sig!!.toByteArray())
 
-    val sig = Signature.getInstance(parameters["oauth_signature"])
-    sig.initVerify(pubKey)
-    val verify = sig.verify(sig.sign())
-
-    println("verify: $verify")
+    println("verify: $isSigValid")
 
     call.respondRedirect("https://infinite-lowlands-71677.herokuapp.com/redirect", false)
+}
+
+fun pubKeyFromString(key: String?): PublicKey {
+    val keyFactory = KeyFactory.getInstance("RSA")
+    val publicKeySpec: EncodedKeySpec = X509EncodedKeySpec(Hex.decodeHex(key))
+    return keyFactory.generatePublic(publicKeySpec)
 }

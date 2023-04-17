@@ -25,7 +25,7 @@ fun Route.initiateLogin(
         if (formParameters["lti_version"] != null &&
             formParameters["lti_version"].equals("LTI-1p0")
         ) {
-            requestInitLoginV1p0(formParameters)
+            requestInitLoginV1p0(formParameters, call)
         } else if (formParameters["login_hint"] != null) {
             requestInitLoginV1p3(formParameters, initLoginDataSource, authenticationData, authUrl)
         } else {

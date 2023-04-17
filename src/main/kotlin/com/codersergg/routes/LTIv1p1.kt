@@ -4,18 +4,14 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
-import io.ktor.util.pipeline.*
-import java.security.KeyFactory
-import java.security.PublicKey
-import java.security.interfaces.RSAPublicKey
-import java.security.spec.X509EncodedKeySpec
 import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 
-suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
-    parameters: Parameters
+suspend fun requestInitLoginV1p0(
+    parameters: Parameters,
+    call: ApplicationCall
 ) {
 
     val isFieldsBlank = parameters["lti_message_type"].toString().isBlank() ||
@@ -41,7 +37,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
 
     // verify
     val encodingAlgorithm = "HmacSHA1"
-    val  secretKey = "privateKey"
+    val secretKey = "privateKey"
 
     val sha1Hmac = Mac.getInstance(encodingAlgorithm)
     val secretKeySpec = SecretKeySpec(secretKey.toByteArray(), encodingAlgorithm)
@@ -56,10 +52,4 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
     println("message: $message")
 
     call.respondRedirect("https://infinite-lowlands-71677.herokuapp.com/redirect", false)
-}
-
-fun pubKeyFromString(key: String?): PublicKey {
-    val keySpecPublic = X509EncodedKeySpec(Base64.getDecoder().decode(key))
-    println("keySpecPublic: $keySpecPublic")
-    return KeyFactory.getInstance("RSA").generatePublic(keySpecPublic) as RSAPublicKey
 }

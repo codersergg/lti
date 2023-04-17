@@ -2,6 +2,7 @@ package com.codersergg.routes
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
 import java.security.KeyFactory
@@ -46,7 +47,9 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
     val secretKeySpec = SecretKeySpec(secretKey.toByteArray(), encodingAlgorithm)
     sha1Hmac.init(secretKeySpec)
 
-    val hash = sha1Hmac.doFinal(sig!!.toByteArray())
+    val body = call.receiveText()
+
+    val hash = sha1Hmac.doFinal(body.encodeToByteArray())
     val message = Base64.getEncoder().encodeToString(hash)
 
     println("hash: $hash")

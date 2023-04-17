@@ -18,7 +18,6 @@ fun Application.configureRouting(
 
     routing {
         initiateLogin(initLoginDataSource, authenticationData)
-        initiateLoginV1p1(initLoginDataSource, authenticationData)
         getSavedInitiateLogin(initLoginDataSource)
         test(testDataSource)
         getAllHeaderValue(testDataSource)

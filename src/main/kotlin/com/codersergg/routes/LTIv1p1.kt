@@ -34,6 +34,8 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
     val publicKey = parameters["oauth_consumer_key"]
     val signatureMethod = parameters["oauth_signature_method"]
     println("sig: $sig")
+    println("publicKey: $publicKey")
+    println("signatureMethod: $signatureMethod")
 
     // verify
     val mySig = Signature.getInstance("NONEwithRSA")
@@ -47,5 +49,6 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
 
 fun pubKeyFromString(key: String?): PublicKey {
     val keySpecPublic = X509EncodedKeySpec(Base64.getDecoder().decode(key))
+    println("keySpecPublic: $keySpecPublic")
     return KeyFactory.getInstance("RSA").generatePublic(keySpecPublic) as RSAPublicKey
 }

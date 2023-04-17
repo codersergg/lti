@@ -10,6 +10,7 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.util.*
 import io.ktor.util.pipeline.*
+import nl.adaptivity.xmlutil.serialization.XML
 import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -48,23 +49,8 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
 suspend fun garde(parameters: Parameters): HttpResponse {
 
     val lisResultSourcedid = parameters["lis_result_sourcedid"]
-    val grade = "0.92"
-
-    val status = HttpClient() {
-        install(ContentNegotiation) {
-            xml()
-        }
-    }.use { client ->
-        client.post(
-            url {
-                host = parameters["lis_outcome_service_url"].toString()
-            }
-        ) {
-            headers {
-                append(HttpHeaders.ContentType, "application/xml")
-            }
-            setBody {
-                """
+    val grade = "1.0"
+    val xmlStr = """
     <?xml version = "1.0" encoding = "UTF-8"?>
     <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
       <imsx_POXHeader>
@@ -90,6 +76,22 @@ suspend fun garde(parameters: Parameters): HttpResponse {
       </imsx_POXBody>
     </imsx_POXEnvelopeRequest>
 """.trimIndent()
+
+    val status = HttpClient() {
+        install(ContentNegotiation) {
+            xml()
+        }
+    }.use { client ->
+        client.post(
+            url {
+                host = parameters["lis_outcome_service_url"].toString()
+            }
+        ) {
+            headers {
+                append(HttpHeaders.ContentType, "application/xml")
+            }
+            setBody {
+                xmlStr
             }
         }
     }

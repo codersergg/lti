@@ -49,6 +49,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
 suspend fun garde(parameters: Parameters): HttpResponse {
 
     val lisResultSourcedid = parameters["lis_result_sourcedid"]
+    val resourceLinkId = parameters["resource_link_id"]
     val grade = "1.0"
     val xmlBody = """
     <?xml version = "1.0" encoding = "UTF-8"?>
@@ -56,14 +57,14 @@ suspend fun garde(parameters: Parameters): HttpResponse {
       <imsx_POXHeader>
         <imsx_POXRequestHeaderInfo>
           <imsx_version>V1.0</imsx_version>
-          <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
+          <imsx_messageIdentifier>$lisResultSourcedid</imsx_messageIdentifier>
         </imsx_POXRequestHeaderInfo>
       </imsx_POXHeader>
       <imsx_POXBody>
         <replaceResultRequest>
           <resultRecord>
             <sourcedGUID>
-              <sourcedId>$lisResultSourcedid</sourcedId>
+              <sourcedId>$resourceLinkId</sourcedId>
             </sourcedGUID>
             <result>
               <resultScore>

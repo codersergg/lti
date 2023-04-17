@@ -57,14 +57,14 @@ suspend fun garde(parameters: Parameters): HttpResponse {
       <imsx_POXHeader>
         <imsx_POXRequestHeaderInfo>
           <imsx_version>V1.0</imsx_version>
-          <imsx_messageIdentifier>$lisResultSourcedid</imsx_messageIdentifier>
+          <imsx_messageIdentifier>$resourceLinkId</imsx_messageIdentifier>
         </imsx_POXRequestHeaderInfo>
       </imsx_POXHeader>
       <imsx_POXBody>
         <replaceResultRequest>
           <resultRecord>
             <sourcedGUID>
-              <sourcedId>$resourceLinkId</sourcedId>
+              <sourcedId>$lisResultSourcedid</sourcedId>
             </sourcedGUID>
             <result>
               <resultScore>

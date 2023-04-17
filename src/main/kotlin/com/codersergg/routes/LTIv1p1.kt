@@ -84,7 +84,8 @@ suspend fun garde(parameters: Parameters): HttpResponse {
     }.use { client ->
         client.post(parameters["lis_outcome_service_url"].toString()) {
             contentType(ContentType.Application.Xml)
-            setBody(InitLogin("3", "Jet", "Brains"))
+            //setBody(InitLogin("3", "Jet", "Brains"))
+            setBody(xmlStr)
         }
     }
     println("status: $status")

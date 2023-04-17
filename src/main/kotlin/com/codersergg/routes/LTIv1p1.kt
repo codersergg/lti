@@ -1,8 +1,12 @@
 package com.codersergg.routes
 
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
+import io.ktor.server.util.*
 import io.ktor.util.pipeline.*
 import java.util.*
 import javax.crypto.Mac
@@ -34,16 +38,60 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
     }
 
     // to do grade
-    garde()
+    garde(parameters)
 
     call.respondRedirect("https://infinite-lowlands-71677.herokuapp.com/redirect", false)
 }
 
-fun garde() {
+suspend fun garde(parameters: Parameters): HttpResponse {
 
+    val lisResultSourcedid = parameters["lis_result_sourcedid"]
+
+    val status = HttpClient().use { client ->
+        client.get(
+            url {
+                protocol = URLProtocol.HTTPS
+                host = parameters["lis_outcome_service_url"].toString()
+            }
+        ) {
+            headers {
+                append(HttpHeaders.ContentType, "application/xml")
+            }
+            setBody {
+                """
+    <?xml version = "1.0" encoding = "UTF-8"?>
+    <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+      <imsx_POXHeader>
+        <imsx_POXRequestHeaderInfo>
+          <imsx_version>V1.0</imsx_version>
+          <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
+        </imsx_POXRequestHeaderInfo>
+      </imsx_POXHeader>
+      <imsx_POXBody>
+        <replaceResultRequest>
+          <resultRecord>
+            <sourcedGUID>
+              <sourcedId>$lisResultSourcedid</sourcedId>
+            </sourcedGUID>
+            <result>
+              <resultScore>
+                <language>en</language>
+                <textString>0.92</textString>
+              </resultScore>
+            </result>
+          </resultRecord>
+        </replaceResultRequest>
+      </imsx_POXBody>
+    </imsx_POXEnvelopeRequest>
+""".trimIndent()
+            }
+        }
+    }
+    println("status: $status")
+    return status
 }
 
-private fun verifyRequest(parameters: Parameters) : Boolean {
+private fun verifyRequest(parameters: Parameters): Boolean {
     val sig = parameters["oauth_signature"]
     val publicKey = parameters["oauth_consumer_key"]
     val signatureMethod = parameters["oauth_signature_method"]

@@ -1,9 +1,11 @@
 package com.codersergg.routes
 
 import io.ktor.client.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.xml.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.util.*
@@ -47,7 +49,11 @@ suspend fun garde(parameters: Parameters): HttpResponse {
 
     val lisResultSourcedid = parameters["lis_result_sourcedid"]
 
-    val status = HttpClient().use { client ->
+    val status = HttpClient() {
+        install(ContentNegotiation) {
+            xml()
+        }
+    }.use { client ->
         client.get(
             url {
                 protocol = URLProtocol.HTTPS

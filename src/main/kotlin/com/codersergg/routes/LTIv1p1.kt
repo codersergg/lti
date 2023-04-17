@@ -92,8 +92,8 @@ suspend fun garde(parameters: Parameters): HttpResponse {
             }
         ) {
             headers {
-                append(HttpHeaders.ContentType, "application/xml")
-                append(HttpHeaders.Accept, "application/xml")
+                append(HttpHeaders.ContentType, "application/json")
+                append(HttpHeaders.Accept, "application/json")
             }
             setBody {
                 InitLogin("1", "2", "3")

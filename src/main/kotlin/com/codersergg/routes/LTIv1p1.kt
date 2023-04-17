@@ -1,16 +1,9 @@
 package com.codersergg.routes
 
-import io.ktor.client.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.xml.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
-import nl.adaptivity.xmlutil.XmlDeclMode
-import nl.adaptivity.xmlutil.serialization.XML
 import org.imsglobal.pox.IMSPOXRequest
 import java.util.*
 import javax.crypto.Mac
@@ -47,74 +40,13 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
     call.respondRedirect("https://infinite-lowlands-71677.herokuapp.com/redirect", false)
 }
 
-suspend fun garde(parameters: Parameters): HttpResponse {
-
-    val dt = Date()
-    val messageId = "" + dt.time
-
-    val lisResultSourcedid = parameters["lis_result_sourcedid"]
-    val resourceLinkId = parameters["resource_link_id"]
-    val grade = "1.0"
-    val xmlBody = """
-    <?xml version = "1.0" encoding = "UTF-8"?>
-    <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-      <imsx_POXHeader>
-        <imsx_POXRequestHeaderInfo>
-          <imsx_version>V1.0</imsx_version>
-          <imsx_messageIdentifier>$messageId</imsx_messageIdentifier>
-        </imsx_POXRequestHeaderInfo>
-      </imsx_POXHeader>
-      <imsx_POXBody>
-        <replaceResultRequest>
-          <resultRecord>
-            <sourcedGUID>
-              <sourcedId>$lisResultSourcedid</sourcedId>
-            </sourcedGUID>
-            <result>
-              <resultScore>
-                <language>en</language>
-                <textString>$grade</textString>
-              </resultScore>
-            </result>
-          </resultRecord>
-        </replaceResultRequest>
-      </imsx_POXBody>
-    </imsx_POXEnvelopeRequest>
-""".trimIndent()
-    val oauthConsumerKey = parameters["oauth_consumer_key"]
-    val oauthNonce = parameters["oauth_nonce"]
-    val oauthTimestamp = parameters["oauth_timestamp"]
-    val sing = getSing(xmlBody)
-    val value =
-        "OAuth realm=\"\",oauth_version=\"1.0\", oauth_nonce=\"$oauthNonce\", oauth_timestamp=\"$oauthTimestamp\", oauth_consumer_key=\"$oauthConsumerKey\", oauth_body_hash=\"${sing.first}\", oauth_signature_method=\"HMAC-SHA1\", oauth_signature=\"${sing.second}\""
+fun garde(parameters: Parameters) {
 
     val urlString = parameters["lis_outcome_service_url"]
     val publicKey = parameters["oauth_consumer_key"]
     val secretKey = "privateKey"
-    IMSPOXRequest.sendReplaceResult(urlString, publicKey,secretKey, lisResultSourcedid, "1.0")
-
-
-    val response: HttpResponse = HttpClient {
-        install(ContentNegotiation) {
-            xml(format = XML {
-                xmlDeclMode = XmlDeclMode.Charset
-            })
-        }
-
-    }.use { client ->
-        client.post(urlString.toString()) {
-            headers {
-                append(HttpHeaders.Authorization, value)
-                append(HttpHeaders.ContentLength, value.length.toString())
-            }
-            contentType(ContentType.Application.Xml)
-            setBody(xmlBody)
-        }
-    }
-    val bodyAsText = response.bodyAsText()
-    println("response: $bodyAsText")
-    println("response: $response")
-    return response
+    val lisResultSourcedid = parameters["lis_result_sourcedid"]
+    IMSPOXRequest.sendReplaceResult(urlString, publicKey, secretKey, lisResultSourcedid, "0.0")
 }
 
 private fun verifyRequest(parameters: Parameters): Boolean {

@@ -9,6 +9,8 @@ import io.ktor.serialization.kotlinx.xml.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
+import nl.adaptivity.xmlutil.XmlDeclMode
+import nl.adaptivity.xmlutil.serialization.XML
 import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -77,8 +79,11 @@ suspend fun garde(parameters: Parameters): HttpResponse {
 
     val response: HttpResponse = HttpClient {
         install(ContentNegotiation) {
-            xml()
+            xml(format = XML {
+                xmlDeclMode = XmlDeclMode.Charset
+            })
         }
+
     }.use { client ->
         client.post(parameters["lis_outcome_service_url"].toString()) {
             contentType(ContentType.Application.Xml)

@@ -30,6 +30,8 @@ fun Route.initiateLogin(
             requestInitLoginV1p3(formParameters, initLoginDataSource, authenticationData, authUrl)
         } else {
             println("Format not supported")
+            call.respond(HttpStatusCode.Conflict, "Format not supported")
+            return@post
         }
     }
 }

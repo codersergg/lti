@@ -22,9 +22,9 @@ fun Route.initiateLogin(
 
         val formParameters = call.receiveParameters()
         println("request $formParameters")
-        if (formParameters["login_hint"].toString().isNotEmpty()) {
+        if (formParameters["login_hint"] != null) {
             requestInitLoginV1p3(formParameters, initLoginDataSource, authenticationData, authUrl)
-        } else if (formParameters["lti_version"].toString().isNotEmpty()) {
+        } else if (formParameters["lti_version"] != null) {
             requestInitLoginV1p0(formParameters)
         }
     }

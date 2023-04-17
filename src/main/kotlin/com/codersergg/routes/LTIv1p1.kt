@@ -1,6 +1,5 @@
 package com.codersergg.routes
 
-import com.codersergg.data.models.InitLogin
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
@@ -9,7 +8,6 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.xml.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
-import io.ktor.server.util.*
 import io.ktor.util.pipeline.*
 import java.util.*
 import javax.crypto.Mac
@@ -87,6 +85,8 @@ suspend fun garde(parameters: Parameters): HttpResponse {
             setBody(xmlStr)
         }
     }
+    val bodyAsText = response.bodyAsText()
+    println("response: $bodyAsText")
     println("response: $response")
     return response
 }

@@ -1,7 +1,8 @@
 package com.codersergg.data.models
 
-import io.ktor.server.sessions.*
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class InitLogin(
     val iss: String,
     val login_hint: String,

@@ -4,12 +4,12 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
-import org.apache.commons.codec.binary.Hex
 import java.security.KeyFactory
 import java.security.PublicKey
 import java.security.Signature
-import java.security.spec.EncodedKeySpec
+import java.security.interfaces.RSAPublicKey
 import java.security.spec.X509EncodedKeySpec
+import java.util.*
 
 
 suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
@@ -33,7 +33,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
     val sig = parameters["oauth_signature"]
     val publicKey = parameters["oauth_consumer_key"]
     val signatureMethod = parameters["oauth_signature_method"]
-    println(sig)
+    println("sig: $sig")
 
     // verify
     val mySig = Signature.getInstance("NONEwithRSA")
@@ -46,7 +46,6 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
 }
 
 fun pubKeyFromString(key: String?): PublicKey {
-    val keyFactory = KeyFactory.getInstance("RSA")
-    val publicKeySpec: EncodedKeySpec = X509EncodedKeySpec(Hex.decodeHex(key))
-    return keyFactory.generatePublic(publicKeySpec)
+    val keySpecPublic = X509EncodedKeySpec(Base64.getDecoder().decode(key))
+    return KeyFactory.getInstance("RSA").generatePublic(keySpecPublic) as RSAPublicKey
 }

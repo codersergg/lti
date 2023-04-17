@@ -1,5 +1,6 @@
 package com.codersergg.routes
 
+import com.codersergg.data.models.InitLogin
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
@@ -90,7 +91,7 @@ suspend fun garde(parameters: Parameters): HttpResponse {
                 append(HttpHeaders.ContentType, "application/xml")
             }
             setBody {
-                xmlStr
+                InitLogin("1", "2", "3")
             }
         }
     }

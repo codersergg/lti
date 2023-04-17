@@ -77,7 +77,7 @@ suspend fun garde(parameters: Parameters): HttpResponse {
     </imsx_POXEnvelopeRequest>
 """.trimIndent()
 
-    val status = HttpClient {
+    val response: HttpResponse = HttpClient {
         install(ContentNegotiation) {
             xml()
         }
@@ -86,9 +86,9 @@ suspend fun garde(parameters: Parameters): HttpResponse {
             contentType(ContentType.Application.Xml)
             setBody(xmlStr)
         }
-    }.call.response
-    println("status: $status")
-    return status
+    }
+    println("status: $response")
+    return response
 }
 
 private fun verifyRequest(parameters: Parameters): Boolean {

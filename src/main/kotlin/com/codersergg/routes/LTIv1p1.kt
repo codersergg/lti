@@ -25,8 +25,25 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
         call.respond(HttpStatusCode.Conflict, "This is not a basic launch message")
         return
     }
-
     println(parameters.toString())
+
+    // to do verify
+    if (!verifyRequest(parameters)) {
+        call.respond(HttpStatusCode.Conflict, "Unauthorized request")
+        return
+    }
+
+    // to do grade
+    garde()
+
+    call.respondRedirect("https://infinite-lowlands-71677.herokuapp.com/redirect", false)
+}
+
+fun garde() {
+
+}
+
+private fun verifyRequest(parameters: Parameters) : Boolean {
     val sig = parameters["oauth_signature"]
     val publicKey = parameters["oauth_consumer_key"]
     val signatureMethod = parameters["oauth_signature_method"]
@@ -42,11 +59,11 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
     val secretKeySpec = SecretKeySpec(secretKey.toByteArray(), encodingAlgorithm)
     sha1Hmac.init(secretKeySpec)
 
-    val hash = sha1Hmac.doFinal(sig!!.encodeToByteArray())
+    val hash = sha1Hmac.doFinal(sig!!.encodeToByteArray()) // params used to sing
     val message = Base64.getEncoder().encodeToString(hash)
 
     println("hash: $hash")
     println("message: $message")
 
-    call.respondRedirect("https://infinite-lowlands-71677.herokuapp.com/redirect", false)
+    return true
 }

@@ -80,20 +80,19 @@ suspend fun garde(parameters: Parameters): HttpResponse {
 """.trimIndent()
 
     val status = HttpClient() {
-        /*install(ContentNegotiation) {
-            xml(format = XML {
-                xmlDeclMode = XmlDeclMode.Charset
-            })
-        }*/
+        install(ContentNegotiation) {
+            xml()
+        }
     }.use { client ->
         client.post(
             url {
-                host = parameters["lis_outcome_service_url"].toString()
+                protocol = URLProtocol.HTTPS
+                host = parameters["lis_outcome_service_url"].toString().replace("https://", "")
             }
         ) {
             headers {
-                append(HttpHeaders.ContentType, "application/json")
-                append(HttpHeaders.Accept, "application/json")
+                append(HttpHeaders.ContentType, "application/xml")
+                append(HttpHeaders.Accept, "application/xml")
             }
             setBody {
                 InitLogin("1", "2", "3")

@@ -56,6 +56,7 @@ dependencies {
     implementation("org.litote.kmongo:kmongo-coroutine:$kmongoVersion")
 
     implementation("commons-codec:commons-codec:$commonsCodecVersion")
+    implementation("org.imsglobal:basiclti-util:1.2.0")
 }
 
 tasks {

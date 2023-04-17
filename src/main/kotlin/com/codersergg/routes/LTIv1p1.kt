@@ -11,6 +11,7 @@ import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
 import nl.adaptivity.xmlutil.XmlDeclMode
 import nl.adaptivity.xmlutil.serialization.XML
+import org.imsglobal.pox.IMSPOXRequest
 import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -87,6 +88,12 @@ suspend fun garde(parameters: Parameters): HttpResponse {
     val value =
         "OAuth realm=\"\",oauth_version=\"1.0\", oauth_nonce=\"$oauthNonce\", oauth_timestamp=\"$oauthTimestamp\", oauth_consumer_key=\"$oauthConsumerKey\", oauth_body_hash=\"${sing.first}\", oauth_signature_method=\"HMAC-SHA1\", oauth_signature=\"${sing.second}\""
 
+    val urlString = parameters["lis_outcome_service_url"]
+    val publicKey = parameters["oauth_consumer_key"]
+    val secretKey = "privateKey"
+    IMSPOXRequest.sendReplaceResult(urlString, publicKey,secretKey, lisResultSourcedid, "1.0")
+
+
     val response: HttpResponse = HttpClient {
         install(ContentNegotiation) {
             xml(format = XML {
@@ -95,7 +102,7 @@ suspend fun garde(parameters: Parameters): HttpResponse {
         }
 
     }.use { client ->
-        client.post(parameters["lis_outcome_service_url"].toString()) {
+        client.post(urlString.toString()) {
             headers {
                 append(HttpHeaders.Authorization, value)
                 append(HttpHeaders.ContentLength, value.length.toString())

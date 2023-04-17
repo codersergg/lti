@@ -56,7 +56,6 @@ suspend fun garde(parameters: Parameters): HttpResponse {
     }.use { client ->
         client.get(
             url {
-                protocol = URLProtocol.HTTPS
                 host = parameters["lis_outcome_service_url"].toString()
             }
         ) {

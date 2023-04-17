@@ -55,7 +55,7 @@ suspend fun garde(parameters: Parameters): HttpResponse {
             xml()
         }
     }.use { client ->
-        client.get(
+        client.post(
             url {
                 host = parameters["lis_outcome_service_url"].toString()
             }
@@ -63,7 +63,7 @@ suspend fun garde(parameters: Parameters): HttpResponse {
             headers {
                 append(HttpHeaders.ContentType, "application/xml")
             }
-            /*setBody {
+            setBody {
                 """
     <?xml version = "1.0" encoding = "UTF-8"?>
     <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -90,7 +90,7 @@ suspend fun garde(parameters: Parameters): HttpResponse {
       </imsx_POXBody>
     </imsx_POXEnvelopeRequest>
 """.trimIndent()
-            }*/
+            }
         }
     }
     println("status: $status")

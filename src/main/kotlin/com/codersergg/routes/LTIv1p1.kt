@@ -6,10 +6,11 @@ import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
 import java.security.KeyFactory
 import java.security.PublicKey
-import java.security.Signature
 import java.security.interfaces.RSAPublicKey
 import java.security.spec.X509EncodedKeySpec
 import java.util.*
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
 
 
 suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
@@ -38,11 +39,18 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
     println("signatureMethod: $signatureMethod")
 
     // verify
-    val mySig = Signature.getInstance("NONEwithRSA")
-    mySig.initVerify(pubKeyFromString(publicKey))
-    val isSigValid = mySig.verify(sig!!.toByteArray())
+    val encodingAlgorithm = "HmacSHA1"
+    val  secretKey = "privateKey"
 
-    println("verify: $isSigValid")
+    val sha1Hmac = Mac.getInstance(encodingAlgorithm)
+    val secretKeySpec = SecretKeySpec(secretKey.toByteArray(), encodingAlgorithm)
+    sha1Hmac.init(secretKeySpec)
+
+    val hash = sha1Hmac.doFinal(sig!!.toByteArray())
+    val message = Base64.getEncoder().encodeToString(hash)
+
+    println("hash: $hash")
+    println("message: $message")
 
     call.respondRedirect("https://infinite-lowlands-71677.herokuapp.com/redirect", false)
 }

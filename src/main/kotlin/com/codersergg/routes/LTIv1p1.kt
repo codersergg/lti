@@ -46,7 +46,7 @@ fun garde(parameters: Parameters) {
     val publicKey = parameters["oauth_consumer_key"]
     val secretKey = "privateKey"
     val lisResultSourcedid = parameters["lis_result_sourcedid"]
-    IMSPOXRequest.sendReplaceResult(urlString, publicKey, secretKey, lisResultSourcedid, "0.5")
+    IMSPOXRequest.sendReplaceResult(urlString, publicKey, secretKey, lisResultSourcedid, "0")
 }
 
 private fun verifyRequest(parameters: Parameters): Boolean {

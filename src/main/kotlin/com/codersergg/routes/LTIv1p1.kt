@@ -80,11 +80,11 @@ suspend fun garde(parameters: Parameters): HttpResponse {
 """.trimIndent()
 
     val status = HttpClient() {
-        install(ContentNegotiation) {
+        /*install(ContentNegotiation) {
             xml(format = XML {
                 xmlDeclMode = XmlDeclMode.Charset
             })
-        }
+        }*/
     }.use { client ->
         client.post(
             url {

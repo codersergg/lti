@@ -87,7 +87,7 @@ suspend fun garde(parameters: Parameters): HttpResponse {
             setBody(xmlStr)
         }
     }
-    println("status: $response")
+    println("response: $response")
     return response
 }
 

@@ -16,11 +16,11 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
+import io.ktor.util.pipeline.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import java.io.File
-import java.net.URLDecoder
 import java.security.KeyFactory
 import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
@@ -29,43 +29,40 @@ import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-fun Route.initiateLogin(
+suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p3(
+    parameters: Parameters,
     initLoginDataSource: InitLoginDataSource,
-    authenticationData: AuthenticationData
+    authenticationData: AuthenticationData,
+    authUrl: String
 ) {
-    post("initiate-login") {
 
-        // Индивидуальные параметры площадки
+    val isFieldsBlank = parameters["iss"].toString().isBlank() ||
+            parameters["login_hint"].toString().isBlank() ||
+            parameters["target_link_uri"].toString().isBlank()
 
-        // url запроса аутентификации в LMS, смотреть в настройках LMS
-        val authUrl = "lti-test-connect.moodlecloud.com/mod/lti/auth.php"
+    if (isFieldsBlank) {
+        call.respond(HttpStatusCode.Conflict, "Fields must not be empty")
+        return
+    }
 
-        val request = call.receiveText()
-        println("request $request")
-        val isFieldsBlank = !request.contains("iss") ||
-                !request.contains("login_hint") ||
-                !request.contains("target_link_uri")
+    parameters["lti_deployment_id"].toString()
 
-        if (isFieldsBlank) {
-            call.respond(HttpStatusCode.Conflict, "Fields must not be empty")
-            return@post
-        }
+    val clientId = parameters["client_id"].toString()
+    val endUserIdentifier = parameters["login_hint"].toString()
+    val iss = parameters["iss"].toString()
+    val initLogin = InitLogin(
+        iss = iss,
+        login_hint = endUserIdentifier,
+        target_link_uri = parameters["target_link_uri"].toString(),
+        lti_message_hint = parameters["lti_message_hint"].toString(),
+        lti_deployment_id = parameters["lti_deployment_id"].toString(),
+        client_id = clientId
+    )
 
-        val clientId = findParameterValue(request, "client_id")
-        val endUserIdentifier = findParameterValue(request, "login_hint")
-        val initLogin = InitLogin(
-            iss = findParameterValue(request, "iss")!!,
-            login_hint = endUserIdentifier!!,
-            target_link_uri = findParameterValue(request, "target_link_uri")!!,
-            lti_message_hint = findParameterValue(request, "lti_message_hint"),
-            lti_deployment_id = findParameterValue(request, "lti_deployment_id"),
-            client_id = clientId
-        )
+    initLoginDataSource.putByLoginHint(initLogin)
 
-        initLoginDataSource.putByLoginHint(initLogin)
-
-        // проверка уникальности
-        /*val wasAcknowledged = initLoginDataSource.putByLoginHint(initLogin)
+    // проверка уникальности
+    /*val wasAcknowledged = initLoginDataSource.putByLoginHint(initLogin)
         if (!wasAcknowledged!!) {
             call.respond(HttpStatusCode.Conflict)
             return@post
@@ -73,40 +70,39 @@ fun Route.initiateLogin(
             call.respond(HttpStatusCode.OK)
         }*/
 
-        val state = UUID.randomUUID().toString()
-        val nonce = UUID.randomUUID().toString()
-        authenticationData.putState(
-            State(
-                state = state,
-                nonce = nonce,
-                clientId = clientId.toString(),
-                endUserIdentifier = endUserIdentifier,
-                iss = findParameterValue(request, "iss")!!
-            )
+    val state = UUID.randomUUID().toString()
+    val nonce = UUID.randomUUID().toString()
+    authenticationData.putState(
+        State(
+            state = state,
+            nonce = nonce,
+            clientId = clientId,
+            endUserIdentifier = endUserIdentifier,
+            iss = iss
         )
-        val url = url {
-            protocol = URLProtocol.HTTPS
-            host = authUrl
+    )
+    val url = url {
+        protocol = URLProtocol.HTTPS
+        host = authUrl
 
-            parameters.append("scope", "openid")
-            parameters.append("response_type", "id_token")
-            parameters.append("client_id", initLogin.client_id.toString())
-            parameters.append("redirect_uri", initLogin.target_link_uri)
-            parameters.append("login_hint", initLogin.login_hint)
-                .also {
-                    if (!initLogin.lti_message_hint.isNullOrBlank()) parameters.append(
-                        "lti_message_hint",
-                        initLogin.lti_message_hint
-                    )
-                }
-            parameters.append("state", state)
-            parameters.append("response_mode", "form_post")
-            parameters.append("nonce", nonce)
-            parameters.append("prompt", "none")
-        }
-
-        call.respondRedirect(url, false)
+        this.parameters.append("scope", "openid")
+        this.parameters.append("response_type", "id_token")
+        this.parameters.append("client_id", initLogin.client_id.toString())
+        this.parameters.append("redirect_uri", initLogin.target_link_uri)
+        this.parameters.append("login_hint", initLogin.login_hint)
+            .also {
+                if (!initLogin.lti_message_hint.isNullOrBlank()) this.parameters.append(
+                    "lti_message_hint",
+                    initLogin.lti_message_hint
+                )
+            }
+        this.parameters.append("state", state)
+        this.parameters.append("response_mode", "form_post")
+        this.parameters.append("nonce", nonce)
+        this.parameters.append("prompt", "none")
     }
+
+    call.respondRedirect(url, false)
 }
 
 fun Route.authenticationResponsePost(
@@ -115,18 +111,18 @@ fun Route.authenticationResponsePost(
     privateKeyString: String
 ) {
     post("authentication-response") {
-        val receiveText = call.receiveText()
+        val formParameters = call.receiveParameters()
 
         // Check State
-        val stateAuthResponse = findParameterValue(receiveText, "state")
-        val state = authenticationData.getState(stateAuthResponse.toString())
-        if (!stateAuthResponse.equals(state.state)) {
+        val stateAuthResponse = formParameters["state"].toString()
+        val state = authenticationData.getState(stateAuthResponse)
+        if (stateAuthResponse != state.state) {
             call.respond(HttpStatusCode.Conflict, "Wrong state")
             return@post
         }
 
-        val token = findParameterValue(receiveText, "id_token")
-        val chunks = token!!.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val token = formParameters["id_token"].toString()
+        val chunks = token.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         val header = String(Base64.getUrlDecoder().decode(chunks[0]))
         val payload = String(Base64.getUrlDecoder().decode(chunks[1]))
         val jsonPayload: Map<String, JsonElement> = Json.parseToJsonElement(payload).jsonObject
@@ -237,32 +233,4 @@ private suspend fun getGrade(
         }
     }
     println("status: $status")
-}
-
-fun Route.redirect() {
-    get("redirect") {
-        // get the interactive from the repository
-        val interactive = "src/main/resources/static/my_interactive_picture.html"
-        call.respondFile(File(interactive))
-    }
-}
-
-// Роут для проверки наличия запроса на аутентификацию
-fun Route.getSavedInitiateLogin(
-    initLoginDataSource: InitLoginDataSource
-) {
-    get("saved-initiate-login") {
-        initLoginDataSource.getAll()
-        call.respond(HttpStatusCode.OK, initLoginDataSource.getAll().toString())
-    }
-}
-
-private fun findParameterValue(text: String, parameterName: String): String? {
-    val second = text.split('&').map {
-        val parts = it.split('=')
-        val name = parts.firstOrNull() ?: ""
-        val value = parts.drop(1).firstOrNull() ?: ""
-        Pair(name, value)
-    }.firstOrNull { it.first == parameterName }?.second
-    return URLDecoder.decode(second, "UTF-8")
 }

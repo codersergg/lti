@@ -48,6 +48,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
 suspend fun garde(parameters: Parameters): HttpResponse {
 
     val lisResultSourcedid = parameters["lis_result_sourcedid"]
+    val grade = "0.92"
 
     val status = HttpClient() {
         install(ContentNegotiation) {
@@ -81,7 +82,7 @@ suspend fun garde(parameters: Parameters): HttpResponse {
             <result>
               <resultScore>
                 <language>en</language>
-                <textString>0.92</textString>
+                <textString>$grade</textString>
               </resultScore>
             </result>
           </resultRecord>

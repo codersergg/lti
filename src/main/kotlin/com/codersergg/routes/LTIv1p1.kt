@@ -95,6 +95,7 @@ suspend fun garde(parameters: Parameters): HttpResponse {
         client.post(parameters["lis_outcome_service_url"].toString()) {
             headers {
                 append(HttpHeaders.Authorization, value)
+                append(HttpHeaders.ContentLength, value.length.toString())
             }
             contentType(ContentType.Application.Xml)
             setBody(xmlBody)

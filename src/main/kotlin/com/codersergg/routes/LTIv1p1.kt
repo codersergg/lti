@@ -50,7 +50,7 @@ suspend fun garde(parameters: Parameters): HttpResponse {
 
     val lisResultSourcedid = parameters["lis_result_sourcedid"]
     val grade = "1.0"
-    val xmlStr = """
+    val xmlBody = """
     <?xml version = "1.0" encoding = "UTF-8"?>
     <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
       <imsx_POXHeader>
@@ -76,6 +76,12 @@ suspend fun garde(parameters: Parameters): HttpResponse {
       </imsx_POXBody>
     </imsx_POXEnvelopeRequest>
 """.trimIndent()
+    val oauthConsumerKey = parameters["oauth_consumer_key"]
+    val oauthNonce = parameters["oauth_nonce"]
+    val oauthTimestamp = parameters["oauth_timestamp"]
+    val sing = getSing(xmlBody)
+    val value =
+        "OAuth realm=\"\",oauth_version=\"1.0\", oauth_nonce=\"$oauthNonce\", oauth_timestamp=\"$oauthTimestamp\",oauth_consumer_key=\"$oauthConsumerKey\", oauth_body_hash=\"${sing.first}\", oauth_signature_method=\"HMAC-SHA1\", oauth_signature=\"${sing.second}\""
 
     val response: HttpResponse = HttpClient {
         install(ContentNegotiation) {
@@ -86,8 +92,11 @@ suspend fun garde(parameters: Parameters): HttpResponse {
 
     }.use { client ->
         client.post(parameters["lis_outcome_service_url"].toString()) {
+            headers {
+                append(HttpHeaders.Authorization, value)
+            }
             contentType(ContentType.Application.Xml)
-            setBody(xmlStr)
+            setBody(xmlBody)
         }
     }
     val bodyAsText = response.bodyAsText()
@@ -105,6 +114,15 @@ private fun verifyRequest(parameters: Parameters): Boolean {
     println("signatureMethod: $signatureMethod")
 
     // verify
+    val (hash, message) = getSing(sig)
+
+    println("hash: $hash")
+    println("message: $message")
+
+    return true
+}
+
+private fun getSing(sig: String?): Pair<ByteArray, String> {
     val encodingAlgorithm = "HmacSHA1"
     val secretKey = "privateKey"
 
@@ -114,9 +132,5 @@ private fun verifyRequest(parameters: Parameters): Boolean {
 
     val hash = sha1Hmac.doFinal(sig!!.encodeToByteArray()) // params used to sing
     val message = Base64.getEncoder().encodeToString(hash)
-
-    println("hash: $hash")
-    println("message: $message")
-
-    return true
+    return Pair(hash, message)
 }

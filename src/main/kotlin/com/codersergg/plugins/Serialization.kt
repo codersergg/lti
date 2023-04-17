@@ -9,6 +9,9 @@ fun Application.configureSerialization() {
     install(ContentNegotiation) {
         json()
     }
+}
+
+fun Application.configureSerialization2() {
     install(ContentNegotiation) {
         xml()
     }

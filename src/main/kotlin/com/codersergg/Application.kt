@@ -24,6 +24,7 @@ fun Application.module() {
         .build()
 
     configureSerialization()
+    configureSerialization2()
     configureMonitoring()
     configureRouting(initLoginDataSource, testDataSource, authenticationData, jwkProvider, privateKeyString)
 }

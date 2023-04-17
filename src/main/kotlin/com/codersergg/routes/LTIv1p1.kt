@@ -11,8 +11,6 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.util.*
 import io.ktor.util.pipeline.*
-import nl.adaptivity.xmlutil.XmlDeclMode
-import nl.adaptivity.xmlutil.serialization.XML
 import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -84,19 +82,9 @@ suspend fun garde(parameters: Parameters): HttpResponse {
             xml()
         }
     }.use { client ->
-        client.post(
-            url {
-                protocol = URLProtocol.HTTPS
-                host = parameters["lis_outcome_service_url"].toString().replace("https://", "")
-            }
-        ) {
-            headers {
-                append(HttpHeaders.ContentType, "application/xml")
-                append(HttpHeaders.Accept, "application/xml")
-            }
-            setBody {
-                InitLogin("1", "2", "3")
-            }
+        client.post(parameters["lis_outcome_service_url"].toString()) {
+            contentType(ContentType.Application.Xml)
+            setBody(InitLogin("3", "Jet", "Brains"))
         }
     }
     println("status: $status")

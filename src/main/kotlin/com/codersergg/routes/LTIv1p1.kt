@@ -10,7 +10,6 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.util.*
 import io.ktor.util.pipeline.*
-import nl.adaptivity.xmlutil.serialization.XML
 import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec

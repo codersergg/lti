@@ -21,12 +21,11 @@ fun Route.initiateLogin(
         val authUrl = "lti-test-connect.moodlecloud.com/mod/lti/auth.php"
 
         val formParameters = call.receiveParameters()
-        val receiveText = call.receiveText()
         println("request $formParameters")
         if (formParameters["lti_version"] != null &&
             formParameters["lti_version"].equals("LTI-1p0")
         ) {
-            requestInitLoginV1p0(formParameters, receiveText)
+            requestInitLoginV1p0(formParameters)
         } else if (formParameters["login_hint"] != null) {
             requestInitLoginV1p3(formParameters, initLoginDataSource, authenticationData, authUrl)
         } else {

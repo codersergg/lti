@@ -2,16 +2,16 @@ package com.codersergg.routes
 
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
+import io.ktor.util.pipeline.*
 import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 
-suspend fun requestInitLoginV1p0(
+suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(
     parameters: Parameters,
-    call: ApplicationCall
+    receiveText: String
 ) {
 
     val isFieldsBlank = parameters["lti_message_type"].toString().isBlank() ||
@@ -43,9 +43,7 @@ suspend fun requestInitLoginV1p0(
     val secretKeySpec = SecretKeySpec(secretKey.toByteArray(), encodingAlgorithm)
     sha1Hmac.init(secretKeySpec)
 
-    val body = call.receiveText()
-
-    val hash = sha1Hmac.doFinal(body.encodeToByteArray())
+    val hash = sha1Hmac.doFinal(receiveText.encodeToByteArray())
     val message = Base64.getEncoder().encodeToString(hash)
 
     println("hash: $hash")

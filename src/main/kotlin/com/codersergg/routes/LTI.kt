@@ -16,7 +16,6 @@ fun Route.initiateLogin(
     post("initiate-login") {
 
         // Индивидуальные параметры площадки
-
         // url запроса аутентификации в LMS, смотреть в настройках LMS
         val authUrl = "lti-test-connect.moodlecloud.com/mod/lti/auth.php"
 
@@ -28,7 +27,6 @@ fun Route.initiateLogin(
         } else if (formParameters["login_hint"] != null) {
             requestInitLoginV1p3(formParameters, initLoginDataSource, authenticationData, authUrl)
         } else {
-            println("Format not supported")
             call.respond(HttpStatusCode.Conflict, "Format not supported")
             return@post
         }

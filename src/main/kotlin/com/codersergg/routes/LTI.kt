@@ -4,7 +4,6 @@ import com.codersergg.data.AuthenticationData
 import com.codersergg.data.InitLoginDataSource
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.io.File
@@ -20,11 +19,12 @@ fun Route.initiateLogin(
         // url запроса аутентификации в LMS, смотреть в настройках LMS
         val authUrl = "lti-test-connect.moodlecloud.com/mod/lti/auth.php"
 
-        val formParameters = call.receiveParameters()
+        val request = call.request
+        val formParameters = request.queryParameters
         if (formParameters["lti_version"] != null &&
             formParameters["lti_version"].equals("LTI-1p0")
         ) {
-            requestInitLoginV1p0(formParameters)
+            requestInitLoginV1p0(request)
         } else if (formParameters["login_hint"] != null) {
             requestInitLoginV1p3(formParameters, initLoginDataSource, authenticationData, authUrl)
         } else {

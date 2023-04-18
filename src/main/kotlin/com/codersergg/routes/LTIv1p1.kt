@@ -49,5 +49,6 @@ fun garde(request: Parameters) {
     val lisResultSourcedid = request["lis_result_sourcedid"]
     // random for testing
     val grade = "%.1f".format(Random.nextDouble(from = 0.0, until = 1.01))
+    println(grade)
     IMSPOXRequest.sendReplaceResult(urlString, publicKey, secretKey, lisResultSourcedid, grade)
 }

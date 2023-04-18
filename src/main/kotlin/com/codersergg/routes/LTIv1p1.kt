@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
 import org.imsglobal.pox.IMSPOXRequest
+import kotlin.random.Random
 
 
 suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(parameters: Parameters) {
@@ -46,5 +47,7 @@ fun garde(request: Parameters) {
     val publicKey = request["oauth_consumer_key"]
     val secretKey = "privateKey"
     val lisResultSourcedid = request["lis_result_sourcedid"]
-    IMSPOXRequest.sendReplaceResult(urlString, publicKey, secretKey, lisResultSourcedid, "1.0")
+    // random for testing
+    val grade = "%.1f".format(Random.nextDouble(from = 0.0, until = 1.01))
+    IMSPOXRequest.sendReplaceResult(urlString, publicKey, secretKey, lisResultSourcedid, grade)
 }

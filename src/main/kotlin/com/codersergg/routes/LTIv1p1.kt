@@ -2,48 +2,49 @@ package com.codersergg.routes
 
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
 import org.imsglobal.pox.IMSPOXRequest
 
 
-suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(request: ApplicationRequest) {
+suspend fun PipelineContext<Unit, ApplicationCall>.requestInitLoginV1p0(parameters: Parameters) {
 
-    val isFieldsBlank = request.queryParameters["lti_message_type"].toString().isBlank() ||
-            request.queryParameters["lti_version"].toString().isBlank() ||
-            request.queryParameters["resource_link_id"].toString().isBlank()
+    val isFieldsBlank = parameters["lti_message_type"].toString().isBlank() ||
+            parameters["lti_version"].toString().isBlank() ||
+            parameters["resource_link_id"].toString().isBlank()
 
     if (isFieldsBlank) {
         call.respond(HttpStatusCode.Conflict, "Fields must not be empty")
         return
     }
-    if (!request.queryParameters["lti_message_type"].equals("basic-lti-launch-request")) {
+    if (!parameters["lti_message_type"].equals("basic-lti-launch-request")) {
         call.respond(HttpStatusCode.Conflict, "This is not a basic launch message")
         return
     }
 
     // verify OAuth1
-    if (!verifyRequest(request)) {
+    if (!verifyParam(parameters)) {
         call.respond(HttpStatusCode.Conflict, "Unauthorized request")
         return
     }
 
     // grade
-    garde(request)
+    garde(parameters)
 
     call.respondRedirect("https://infinite-lowlands-71677.herokuapp.com/redirect", false)
 }
 
-private fun verifyRequest(request: ApplicationRequest): Boolean {
+private fun verifyParam(parameters: Parameters): Boolean {
     // to do verify
+    // https://api.ktor.io/ktor-server/ktor-server-plugins/ktor-server-auth/io.ktor.server.auth/-o-auth-server-settings/-o-auth1a-server-settings/index.html
+    if (parameters["oauth_consumer_key"] == null) return false
     return true
 }
 
-fun garde(request: ApplicationRequest) {
-    val urlString = request.queryParameters["lis_outcome_service_url"]
-    val publicKey = request.queryParameters["oauth_consumer_key"]
+fun garde(request: Parameters) {
+    val urlString = request["lis_outcome_service_url"]
+    val publicKey = request["oauth_consumer_key"]
     val secretKey = "privateKey"
-    val lisResultSourcedid = request.queryParameters["lis_result_sourcedid"]
+    val lisResultSourcedid = request["lis_result_sourcedid"]
     IMSPOXRequest.sendReplaceResult(urlString, publicKey, secretKey, lisResultSourcedid, "1.0")
 }

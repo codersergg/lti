@@ -1,6 +1,5 @@
 package com.codersergg
 
-import com.auth0.jwk.JwkProviderBuilder
 import com.codersergg.auth.data.MemoryAuthDataSource
 import com.codersergg.auth.plugins.authOauthGoogle
 import com.codersergg.data.MemoryAuthenticationData
@@ -12,7 +11,6 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import java.util.concurrent.TimeUnit
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -21,30 +19,40 @@ fun Application.module() {
     val initLoginDataSource = MemoryInitLoginDataSource()
     val testDataSource = MemoryTestDataSource()
     val authenticationData = MemoryAuthenticationData()
-    val issuer = environment.config.property("jwt.issuer").getString()
-    val privateKeyString = environment.config.property("jwt.privateKey").getString()
+    /*val issuer = environment.config.property("jwt.issuer").getString()
+    val privateKeyString = environment.config.property("jwt.privateKey").getString()*/
     val authDataSource = MemoryAuthDataSource()
 
-    val jwkProvider = JwkProviderBuilder(issuer)
+    /*val jwkProvider = JwkProviderBuilder(issuer)
         .cached(10, 24, TimeUnit.HOURS)
         .rateLimited(10, 1, TimeUnit.MINUTES)
-        .build()
+        .build()*/
 
     val httpClient = HttpClient(CIO) {
         install(ContentNegotiation) {
             json()
         }
     }
-    authOauthGoogle(httpClient)
+    authOauthGoogle(
+        authDataSource,
+        httpClient
+    )
 
     configureSerialization()
     configureMonitoring()
+    /*   configureRouting(
+           initLoginDataSource,
+           testDataSource,
+           authenticationData,
+           jwkProvider,
+           privateKeyString,
+           authDataSource,
+           httpClient
+       )*/
     configureRouting(
         initLoginDataSource,
         testDataSource,
         authenticationData,
-        jwkProvider,
-        privateKeyString,
         authDataSource,
         httpClient
     )

@@ -15,8 +15,6 @@ fun Application.configureRouting(
     initLoginDataSource: InitLoginDataSource,
     testDataSource: TestDataSource,
     authenticationData: AuthenticationData,
-    jwkProvider: JwkProvider,
-    privateKeyString: String,
     authDataSource: AuthDataSource,
     httpClient: HttpClient
 ) {
@@ -30,7 +28,7 @@ fun Application.configureRouting(
         getAllEncoding(testDataSource)
         getSizeTestRequest(testDataSource)
         getAllReceiveText(testDataSource)
-        authenticationResponsePost(authenticationData, jwkProvider, privateKeyString)
+        //authenticationResponsePost(authenticationData)
         redirect()
     }
 

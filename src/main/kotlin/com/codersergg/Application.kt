@@ -35,6 +35,7 @@ fun Application.module() {
             json()
         }
     }
+    authOauthGoogle(httpClient)
 
     configureSerialization()
     configureMonitoring()
@@ -47,5 +48,4 @@ fun Application.module() {
         authDataSource,
         httpClient
     )
-    authOauthGoogle(httpClient)
 }

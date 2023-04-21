@@ -22,7 +22,7 @@ fun Application.configureRouting(
 ) {
 
     routing {
-        //auth(authDataSource, httpClient)
+        auth(authDataSource, httpClient)
         initiateLogin(initLoginDataSource, authenticationData)
         getSavedInitiateLogin(initLoginDataSource)
         test(testDataSource)

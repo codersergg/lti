@@ -12,7 +12,7 @@ fun Application.authOauthGoogle(httpClient: HttpClient) {
         cookie<UserSession>("user_session")
     }
     val redirects = mutableMapOf<String, String>()
-    /*install(Authentication) {
+    install(Authentication) {
         oauth("auth-oauth-google") {
             urlProvider = { "http://localhost:8080/callback" }
             providerLookup = {
@@ -32,5 +32,5 @@ fun Application.authOauthGoogle(httpClient: HttpClient) {
             }
             client = httpClient
         }
-    }*/
+    }
 }

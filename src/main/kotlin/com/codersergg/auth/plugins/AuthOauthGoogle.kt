@@ -7,7 +7,6 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.sessions.*
-import io.ktor.server.util.*
 
 fun Application.authOauthGoogle(
     authDataSource: AuthDataSource,
@@ -18,7 +17,7 @@ fun Application.authOauthGoogle(
     }
     install(Authentication) {
         oauth("auth-oauth-google") {
-            urlProvider = { "http://localhost:8080/callback" }
+            urlProvider = { "https://infinite-lowlands-71677.herokuapp.com/callback" }
             providerLookup = {
                 OAuthServerSettings.OAuth2ServerSettings(
                     name = "google",

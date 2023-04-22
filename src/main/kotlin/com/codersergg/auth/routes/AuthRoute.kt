@@ -50,7 +50,7 @@ fun Route.auth(authDataSource: AuthDataSource, httpClient: HttpClient) {
             }.body()
             call.respondText("Hello, ${userInfo.name}!")
         } else {
-            val redirectUrl = URLBuilder("http://0.0.0.0:8080/login").run {
+            val redirectUrl = URLBuilder("https://infinite-lowlands-71677.herokuapp.com/login").run {
                 parameters.append("redirectUrl", call.request.uri)
                 build()
             }

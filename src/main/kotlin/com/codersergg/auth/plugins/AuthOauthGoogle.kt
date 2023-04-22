@@ -20,7 +20,7 @@ fun Application.authOauthGoogle(
             urlProvider = { "https://infinite-lowlands-71677.herokuapp.com/callback" }
             providerLookup = {
                 OAuthServerSettings.OAuth2ServerSettings(
-                    name = "google",
+                    name = "admin-service-dev",
                     authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
                     accessTokenUrl = "https://accounts.google.com/o/oauth2/token",
                     requestMethod = HttpMethod.Post,
